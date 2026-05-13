@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<title>BellitaBot — Asistente IA</title>
+
+<style>
+
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
+
+:root{
+  --rosa:#e8608a;
+  --rosa-dark:#c0476d;
+  --rosa-light:#fde8f1;
+  --dorado:#d4a847;
+  --bg:#fcf7fa;
+  --surface:#ffffff;
+  --border:#f1dce7;
+  --text:#2b1b24;
+  --muted:#8c7482;
+  --verde:#3ba06f;
+  --radius:18px;
+  --font:'Sora',sans-serif;
+}
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
+
+body{
+  font-family:var(--font);
+  background:var(--bg);
+  color:var(--text);
+  height:100vh;
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+}
+
+/* HEADER */
+
+header{
+  background:var(--surface);
+  border-bottom:1px solid var(--border);
+  padding:16px 22px;
+  display:flex;
+  align-items:center;
+  gap:14px;
+}
+
+.logo{
+  width:44px;
+  height:44px;
+  border-radius:14px;
+  background:linear-gradient(135deg,var(--rosa),var(--dorado));
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:20px;
+}
+
+.header-info h1{
+  font-size:16px;
+  font-weight:600;
+}
+
+.header-info p{
+  font-size:12px;
+  color:var(--muted);
+}
+
+.status{
+  margin-left:auto;
+  width:10px;
+  height:10px;
+  border-radius:50%;
+  background:var(--verde);
+  box-shadow:0 0 0 5px rgba(59,160,111,.15);
+  animation:pulse 2s infinite;
+}
+
+@keyframes pulse{
+  0%,100%{
+    box-shadow:0 0 0 5px rgba(59,160,111,.15);
+  }
+  50%{
+    box-shadow:0 0 0 10px rgba(59,160,111,.05);
+  }
+}
+
+/* SUGGESTIONS */
+
+.suggestions{
+  padding:16px 20px 0;
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+}
+
+.suggestions button{
+  border:none;
+  background:var(--surface);
+  border:1px solid var(--border);
+  color:var(--rosa-dark);
+  border-radius:999px;
+  padding:8px 14px;
+  cursor:pointer;
+  font-size:12px;
+  font-family:var(--font);
+  font-weight:500;
+  transition:.2s;
+}
+
+.suggestions button:hover{
+  background:var(--rosa-light);
+  border-color:var(--rosa);
+}
+
+/* CHAT */
+
+#messages{
+  flex:1;
+  overflow-y:auto;
+  padding:20px;
+  display:flex;
+  flex-direction:column;
+  gap:18px;
+}
+
+.msg{
+  display:flex;
+  gap:10px;
+  max-width:82%;
+}
+
+.msg.user{
+  align-self:flex-end;
+  flex-direction:row-reverse;
+}
+
+.msg.bot{
+  align-self:flex-start;
+}
+
+.avatar{
+  width:34px;
+  height:34px;
+  border-radius:12px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-shrink:0;
+}
+
+.msg.bot .avatar{
+  background:linear-gradient(135deg,var(--rosa),var(--dorado));
+}
+
+.msg.user .avatar{
+  background:#e9dfea;
+}
+
+.bubble{
+  padding:14px 16px;
+  border-radius:18px;
+  line-height:1.7;
+  font-size:14px;
+}
+
+.msg.bot .bubble{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-bottom-left-radius:4px;
+}
+
+.msg.user .bubble{
+  background:linear-gradient(135deg,var(--rosa),var(--rosa-dark));
+  color:white;
+  border-bottom-right-radius:4px;
+}
+
+.typing .bubble{
+  display:flex;
+  gap:5px;
+  align-items:center;
+}
+
+.typing span{
+  width:7px;
+  height:7px;
+  border-radius:50%;
+  background:#999;
+  animation:bounce .9s infinite;
+}
+
+.typing span:nth-child(2){
+  animation-delay:.2s;
+}
+
+.typing span:nth-child(3){
+  animation-delay:.4s;
+}
+
+@keyframes bounce{
+  0%,80%,100%{
+    transform:translateY(0);
+  }
+  40%{
+    transform:translateY(-6px);
+  }
+}
+
+/* INPUT */
+
+.input-area{
+  background:var(--surface);
+  border-top:1px solid var(--border);
+  padding:14px 20px 18px;
+  display:flex;
+  gap:10px;
+}
+
+#user-input{
+  flex:1;
+  resize:none;
+  border:none;
+  outline:none;
+  background:var(--bg);
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:13px 15px;
+  font-size:14px;
+  font-family:var(--font);
+  max-height:120px;
+}
+
+#user-input:focus{
+  border-color:var(--rosa);
+}
+
+#send-btn{
+  width:46px;
+  height:46px;
+  border:none;
+  border-radius:14px;
+  background:linear-gradient(135deg,var(--rosa),var(--rosa-dark));
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+}
+
+#send-btn svg{
+  width:18px;
+  height:18px;
+  stroke:white;
+}
+
+::-webkit-scrollbar{
+  width:5px;
+}
+
+::-webkit-scrollbar-thumb{
+  background:var(--border);
+  border-radius:999px;
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+
+  <div class="logo">🛍️</div>
+
+  <div class="header-info">
+    <h1>BellitaBot</h1>
+    <p>Asistente inteligente de Bazar Bellita</p>
+  </div>
+
+  <div class="status"></div>
+
+</header>
+
+<div class="suggestions">
+
+  <button onclick="suggest('¿Cuáles fueron las ventas de hoy?')">
+    📊 Ventas
+  </button>
+
+  <button onclick="suggest('¿Qué productos son más rentables?')">
+    💰 Rentabilidad
+  </button>
+
+  <button onclick="suggest('¿Qué productos tienen baja rotación?')">
+    📦 Inventario
+  </button>
+
+  <button onclick="suggest('¿Cómo puedo vender más?')">
+    🚀 Estrategias
+  </button>
+
+</div>
+
+<div id="messages"></div>
+
+<div class="input-area">
+
+  <textarea
+    id="user-input"
+    rows="1"
+    placeholder="Pregúntame sobre ventas, productos o crecimiento..."
+  ></textarea>
+
+  <button id="send-btn" onclick="sendMessage()">
+
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+      <line x1="22" y1="2" x2="11" y2="13"/>
+      <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+    </svg>
+
+  </button>
+
+</div>
+
+<script>
+
+/* =====================================
+   URL DE TU SERVER PYTHON RENDER
+===================================== */
+
+const SERVER = "https://bellitabot.onrender.com";
+
+/* ===================================== */
+
+let history = [];
+
+function addMessage(role, text){
+
+  const wrap = document.createElement("div");
+
+  wrap.className = `msg ${role}`;
+
+  const avatar = document.createElement("div");
+
+  avatar.className = "avatar";
+
+  avatar.textContent = role === "bot"
+    ? "🛍️"
+    : "👤";
+
+  const bubble = document.createElement("div");
+
+  bubble.className = "bubble";
+
+  if(role === "bot"){
+
+    bubble.innerHTML = formatText(text);
+
+  }else{
+
+    bubble.textContent = text;
+
+  }
+
+  wrap.appendChild(avatar);
+
+  wrap.appendChild(bubble);
+
+  document
+    .getElementById("messages")
+    .appendChild(wrap);
+
+  scrollBottom();
+}
+
+function addBot(text){
+  addMessage("bot", text);
+}
+
+function addUser(text){
+  addMessage("user", text);
+}
+
+function suggest(text){
+
+  document.getElementById("user-input").value = text;
+
+  sendMessage();
+}
+
+function scrollBottom(){
+
+  const box = document.getElementById("messages");
+
+  box.scrollTop = box.scrollHeight;
+}
+
+function formatText(text){
+
+  return text
+    .replace(/\*\*(.*?)\*\*/g,"<strong>$1</strong>")
+    .replace(/\n/g,"<br>");
+}
+
+function showTyping(){
+
+  const wrap = document.createElement("div");
+
+  wrap.className = "msg bot typing";
+
+  wrap.id = "typing";
+
+  wrap.innerHTML = `
+    <div class="avatar">🛍️</div>
+
+    <div class="bubble">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+  `;
+
+  document
+    .getElementById("messages")
+    .appendChild(wrap);
+
+  scrollBottom();
+}
+
+function hideTyping(){
+
+  const el = document.getElementById("typing");
+
+  if(el) el.remove();
+}
+
+async function sendMessage(){
+
+  const input = document.getElementById("user-input");
+
+  const text = input.value.trim();
+
+  if(!text) return;
+
+  input.value = "";
+
+  addUser(text);
+
+  history.push({
+    role:"user",
+    content:text
+  });
+
+  showTyping();
+
+  try{
+
+    const response = await fetch(
+      `${SERVER}/chat`,
+      {
+        method:"POST",
+
+        headers:{
+          "Content-Type":"application/json"
+        },
+
+        body:JSON.stringify({
+          messages:history
+        })
+      }
+    );
+
+    if(!response.ok){
+
+      throw new Error(
+        `HTTP ${response.status}`
+      );
+    }
+
+    const data = await response.json();
+
+    const reply =
+      data.reply || "Sin respuesta.";
+
+    history.push({
+      role:"assistant",
+      content:reply
+    });
+
+    hideTyping();
+
+    addBot(reply);
+
+  }catch(err){
+
+    hideTyping();
+
+    addBot(
+`⚠️ Error conectando con BellitaBot.
+
+Verifica:
+• Que Render esté online
+• Que server.py funcione
+• Que la URL sea correcta
+• Que exista ANTHROPIC_API_KEY`
+    );
+
+    console.error(err);
+  }
+}
+
+/* ENTER */
+
+document
+.getElementById("user-input")
+.addEventListener("keydown",function(e){
+
+  if(
+    e.key === "Enter" &&
+    !e.shiftKey
+  ){
+
+    e.preventDefault();
+
+    sendMessage();
+  }
+});
+
+/* AUTO RESIZE */
+
+document
+.getElementById("user-input")
+.addEventListener("input",function(){
+
+  this.style.height = "auto";
+
+  this.style.height =
+    Math.min(this.scrollHeight,120)
+    + "px";
+});
+
+/* START */
+
+window.onload = () => {
+
+  addBot(
+`¡Hola! 👋
+
+Soy **BellitaBot**, el asistente IA de Bazar Bellita 🛍️
+
+Puedo ayudarte a:
+• Analizar ventas
+• Revisar productos
+• Detectar productos rentables
+• Revisar inventario
+• Recomendar estrategias
+
+¿Qué quieres consultar hoy?`
+  );
+
+};
+
+</script>
+
+</body>
+</html>
