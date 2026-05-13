@@ -16,10 +16,15 @@ PORT = int(os.environ.get("PORT", 8000))
 
 BAZAR_API = "https://bazar-bellita.onrender.com"
 
-# ⚠️ TU API KEY
+# ⚠️ RECOMENDADO:
+# usar variable de entorno en Render
 OPENAI_KEY = "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"
 
-# Caché de contexto
+
+# =========================================
+# CACHE
+# =========================================
+
 CONTEXT_CACHE = {
     "data": None,
     "timestamp": 0
@@ -64,9 +69,11 @@ Reglas:
 # =========================================
 
 def fetch_bazar(path):
+
     url = BAZAR_API + path
 
     try:
+
         req = urllib.request.Request(
             url,
             headers={
@@ -75,15 +82,16 @@ def fetch_bazar(path):
         )
 
         with urllib.request.urlopen(req, timeout=20) as response:
+
             raw = response.read().decode("utf-8")
-            data = json.loads(raw)
 
             return {
                 "ok": True,
-                "data": data
+                "data": json.loads(raw)
             }
 
     except Exception as e:
+
         return {
             "ok": False,
             "error": str(e)
@@ -97,12 +105,13 @@ def gather_business_context():
 
     now = time.time()
 
-    # usar caché
     if (
         CONTEXT_CACHE["data"]
         and (now - CONTEXT_CACHE["timestamp"]) < CACHE_TTL_SECONDS
     ):
-        print("📦 Contexto desde caché")
+
+        print("📦 Usando caché")
+
         return CONTEXT_CACHE["data"]
 
     print("🔄 Actualizando contexto...")
@@ -157,12 +166,15 @@ def gather_business_context():
 def validate_messages(messages):
 
     if not isinstance(messages, list):
-        return False, "messages debe ser lista"
+        return False, "messages debe ser una lista"
 
     if len(messages) == 0:
         return False, "messages vacío"
 
-    valid_roles = {"user", "assistant"}
+    valid_roles = {
+        "user",
+        "assistant"
+    }
 
     for i, msg in enumerate(messages):
 
@@ -190,11 +202,11 @@ def validate_messages(messages):
 def ask_openai(messages, business_data):
 
     if not OPENAI_KEY:
-        return "⚠️ API key faltante"
+        return "⚠️ OPENAI_API_KEY faltante"
 
     system_message = {
         "role": "system",
-        "content": SYSTEM_PROMPT + "\n\nDATOS:\n" + business_data
+        "content": SYSTEM_PROMPT + "\n\nDATOS DEL NEGOCIO:\n" + business_data
     }
 
     full_messages = [system_message] + messages
@@ -230,14 +242,14 @@ def ask_openai(messages, business_data):
 
         error_body = e.read().decode("utf-8")
 
-        print("❌ OPENAI ERROR:")
+        print("❌ OPENAI HTTP ERROR")
         print(error_body)
 
         return f"⚠️ Error OpenAI {e.code}"
 
     except Exception as e:
 
-        print("❌ ERROR GENERAL:")
+        print("❌ OPENAI ERROR")
         print(str(e))
 
         return "⚠️ Error interno IA"
@@ -248,9 +260,9 @@ def ask_openai(messages, business_data):
 
 class Handler(BaseHTTPRequestHandler):
 
-    # -------------------------------------
-    # CORS
-    # -------------------------------------
+    # =====================================
+    # HEADERS CORS
+    # =====================================
 
     def end_headers(self):
 
@@ -266,12 +278,12 @@ class Handler(BaseHTTPRequestHandler):
 
         self.send_header(
             "Access-Control-Allow-Headers",
-            "Content-Type"
+            "*"
         )
 
         super().end_headers()
 
-    # -------------------------------------
+    # =====================================
 
     def log_message(self, fmt, *args):
 
@@ -279,7 +291,7 @@ class Handler(BaseHTTPRequestHandler):
             f"[{datetime.now().strftime('%H:%M:%S')}] {fmt % args}"
         )
 
-    # -------------------------------------
+    # =====================================
 
     def send_json(self, code, obj):
 
@@ -324,7 +336,7 @@ class Handler(BaseHTTPRequestHandler):
 
         self.send_header(
             "Access-Control-Allow-Headers",
-            "Content-Type"
+            "*"
         )
 
         self.end_headers()
@@ -342,7 +354,7 @@ class Handler(BaseHTTPRequestHandler):
                 {
                     "status": "online",
                     "bot": "BellitaBot",
-                    "version": "2.1"
+                    "version": "3.0"
                 }
             )
 
@@ -432,11 +444,11 @@ class Handler(BaseHTTPRequestHandler):
 
                 return
 
-            print("📊 Obteniendo datos...")
+            print("📊 Obteniendo datos negocio...")
 
             business_data = gather_business_context()
 
-            print("🤖 Preguntando a OpenAI...")
+            print("🤖 Consultando OpenAI...")
 
             reply = ask_openai(
                 messages,
@@ -452,7 +464,7 @@ class Handler(BaseHTTPRequestHandler):
 
         except Exception as e:
 
-            print("❌ ERROR POST:")
+            print("❌ ERROR POST")
             print(str(e))
 
             self.send_json(
@@ -469,16 +481,16 @@ class Handler(BaseHTTPRequestHandler):
 def main():
 
     print("=" * 50)
-    print("🛍️ BellitaBot v2.1")
+    print("🛍️ BellitaBot v3.0")
     print("=" * 50)
 
     print(f"Puerto : {PORT}")
     print(f"API    : {BAZAR_API}")
 
     if OPENAI_KEY:
-        print("✅ OpenAI OK")
+        print("✅ OpenAI configurado")
     else:
-        print("❌ OpenAI faltante")
+        print("❌ OPENAI_API_KEY faltante")
 
     server = HTTPServer(
         ("0.0.0.0", PORT),
