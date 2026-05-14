@@ -1,83 +1,335 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Ventas - Bazar Bellita</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
   <style>
-    body { margin: 0; font-family: 'Segoe UI'; display: flex; background: #f5f6fa; }
-    .sidebar { width: 220px; background: #1e272e; color: white; height: 100vh; padding: 20px; box-sizing: border-box; }
-    .sidebar a { display: block; color: white; padding: 10px; text-decoration: none; margin-top: 10px; border-radius: 8px; }
-    .sidebar a:hover { background: #485460; }
-    .main { flex: 1; overflow-y: auto; }
-    .header { background: #ff3f34; color: white; padding: 15px; font-size: 20px; }
-    .contenido { padding: 20px; display: flex; gap: 20px; }
-    .card { background: white; padding: 15px; border-radius: 12px; flex: 1; }
-    input[type="text"], input[type="number"], input[type="email"], input[type="tel"], input:not([type]) {
-      padding: 8px; margin: 5px 0; width: 100%; box-sizing: border-box; border: 1px solid #ddd; border-radius: 6px;
+    :root {
+      --rojo: #ff3f34;
+      --rojo-dark: #c0392b;
+      --verde: #2ed573;
+      --oscuro: #1e272e;
+      --gris: #f5f6fa;
+      --sidebar-w: 220px;
     }
-    select {
-      padding: 8px; margin: 5px 0; width: 100%; box-sizing: border-box;
-      border: 1px solid #ddd; border-radius: 6px; font-family: 'Segoe UI'; font-size: 14px;
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: var(--gris);
+      color: #2d3436;
+      min-height: 100vh;
     }
-    button { padding: 8px 12px; border: none; background: #ff3f34; color: white; border-radius: 6px; cursor: pointer; }
-    button:hover { background: #e03329; }
-    ul { list-style: none; padding: 0; margin: 0; }
-    .overlay {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.6); display: none;
-      justify-content: center; align-items: center; z-index: 1000;
+
+    /* ───────── SIDEBAR (desktop) ───────── */
+    .sidebar {
+      position: fixed; top: 0; left: 0;
+      width: var(--sidebar-w); height: 100vh;
+      background: var(--oscuro); color: white;
+      padding: 20px; overflow-y: auto;
+      display: flex; flex-direction: column; gap: 4px;
+      z-index: 200;
     }
-    .factura { background: white; padding: 20px; width: 420px; max-height: 80vh; overflow-y: auto; border-radius: 10px; }
-    .factura-btns { display: flex; gap: 10px; margin-top: 12px; }
-    .modal-credito {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.6); display: none;
-      justify-content: center; align-items: center; z-index: 1100;
+    .sidebar h2 { font-size: 22px; font-weight: 800; margin-bottom: 12px; letter-spacing: 1px; }
+    .sidebar a {
+      display: flex; align-items: center; gap: 10px;
+      color: white; padding: 10px 12px;
+      text-decoration: none; border-radius: 10px;
+      font-size: 14px; font-weight: 600; transition: background .2s;
     }
-    .modal-credito-box { background: white; padding: 24px; width: 320px; border-radius: 10px; }
-    .modal-credito-box h3 { margin: 0 0 16px; }
-    .modal-credito-box input, .modal-credito-box select { margin-bottom: 10px; }
-    .modal-credito-box .btns { display: flex; gap: 10px; margin-top: 8px; }
-    .modal-credito-box .btns button.cancel { background: #888; }
-    .pagoBtn { display: flex; gap: 6px; margin: 8px 0; flex-wrap: wrap; }
-    .pagoBtn button { flex: 1; min-width: 80px; }
-    .activo { background: #2ed573 !important; color: #1e272e !important; }
-    .vuelto-ok { color: #27ae60; font-weight: 500; }
-    .vuelto-falta { color: #ff3f34; font-weight: 500; }
-    #carrito li { display: flex; align-items: center; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #f0f0f0; }
-    #carrito li:last-child { border-bottom: none; }
-    #lista li { display: flex; align-items: center; justify-content: space-between; padding: 6px 4px; border-bottom: 1px solid #f5f5f5; font-size: 14px; }
+    .sidebar a:hover, .sidebar a.activa { background: #485460; }
+
+    /* ───────── TOPBAR (móvil) ───────── */
+    .topbar {
+      display: none;
+      position: fixed; top: 0; left: 0; right: 0;
+      height: 56px; background: var(--rojo);
+      align-items: center; padding: 0 16px; gap: 14px;
+      z-index: 300; box-shadow: 0 2px 8px rgba(0,0,0,.25);
+    }
+    .topbar-title { color: white; font-size: 17px; font-weight: 800; flex: 1; }
+    .topbar button {
+      background: rgba(255,255,255,.2); border: none;
+      color: white; width: 38px; height: 38px;
+      border-radius: 10px; font-size: 18px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    /* drawer móvil */
+    .drawer-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,.5); z-index: 400;
+    }
+    .drawer {
+      position: fixed; top: 0; left: -260px; width: 240px; height: 100vh;
+      background: var(--oscuro); color: white;
+      padding: 20px; transition: left .3s ease;
+      z-index: 500; display: flex; flex-direction: column; gap: 4px;
+    }
+    .drawer.open { left: 0; }
+    .drawer h2 { font-size: 22px; font-weight: 800; margin-bottom: 12px; }
+    .drawer a {
+      display: flex; align-items: center; gap: 10px;
+      color: white; padding: 10px 12px;
+      text-decoration: none; border-radius: 10px;
+      font-size: 15px; font-weight: 600;
+    }
+    .drawer a:hover { background: #485460; }
+
+    /* ───────── MAIN ───────── */
+    .main {
+      margin-left: var(--sidebar-w);
+      min-height: 100vh;
+    }
+    .header {
+      background: var(--rojo); color: white;
+      padding: 16px 24px; font-size: 20px; font-weight: 800;
+      position: sticky; top: 0; z-index: 100;
+    }
+    .contenido {
+      padding: 20px; display: flex; gap: 20px; align-items: flex-start;
+    }
+
+    /* ───────── CARDS ───────── */
+    .card {
+      background: white; padding: 18px;
+      border-radius: 16px; flex: 1;
+      box-shadow: 0 2px 12px rgba(0,0,0,.07);
+    }
+    .card h3 { font-size: 15px; font-weight: 800; margin-bottom: 12px; color: #636e72; text-transform: uppercase; letter-spacing: .5px; }
+
+    /* ───────── INPUTS ───────── */
+    input[type="text"], input[type="number"], input[type="email"],
+    input[type="tel"], input:not([type]), select {
+      padding: 10px 12px; margin: 5px 0;
+      width: 100%; border: 1.5px solid #e0e0e0;
+      border-radius: 10px; font-family: 'Nunito', sans-serif;
+      font-size: 14px; transition: border .2s;
+      background: #fafafa;
+    }
+    input:focus, select:focus { outline: none; border-color: var(--rojo); background: white; }
+
+    /* ───────── BUTTONS ───────── */
+    button {
+      padding: 9px 14px; border: none;
+      background: var(--rojo); color: white;
+      border-radius: 10px; cursor: pointer;
+      font-family: 'Nunito', sans-serif;
+      font-size: 14px; font-weight: 700;
+      transition: background .15s, transform .1s;
+    }
+    button:hover { background: var(--rojo-dark); }
+    button:active { transform: scale(.97); }
+
+    /* ───────── LISTA PRODUCTOS ───────── */
+    ul { list-style: none; }
+    #lista li {
+      display: flex; align-items: center;
+      justify-content: space-between;
+      padding: 8px 4px; border-bottom: 1px solid #f0f0f0;
+      font-size: 14px; gap: 8px;
+    }
     #lista li:last-child { border-bottom: none; }
-    #lista li button { padding: 4px 10px; font-size: 13px; }
-    .total-line { font-size: 18px; font-weight: 600; margin: 10px 0 4px; }
-    .descuento-preview { font-size: 13px; color: #888; margin: 0 0 8px; }
+    #lista li .info { flex: 1; min-width: 0; }
+    #lista li .info span { display: block; font-weight: 700; }
+    #lista li .info small { color: #888; font-size: 12px; }
+    #lista li button { padding: 6px 12px; font-size: 13px; flex-shrink: 0; }
+
+    /* ───────── CARRITO ───────── */
+    #carrito li {
+      display: flex; align-items: center;
+      justify-content: space-between;
+      padding: 8px 0; border-bottom: 1px solid #f5f5f5;
+      font-size: 14px; gap: 8px;
+    }
+    #carrito li:last-child { border-bottom: none; }
+    #carrito li .info { flex: 1; }
+    #carrito li .info span { font-weight: 600; }
+    #carrito li .info small { color: #888; font-size: 12px; }
+
+    .total-line { font-size: 20px; font-weight: 800; margin: 12px 0 4px; }
+    .descuento-preview { font-size: 13px; color: #888; margin-bottom: 8px; }
+
+    /* ───────── TIPO PAGO ───────── */
+    .pagoBtn { display: flex; gap: 6px; margin: 10px 0; flex-wrap: wrap; }
+    .pagoBtn button { flex: 1; min-width: 80px; background: #e0e0e0; color: #444; }
+    .pagoBtn button.activo { background: var(--verde) !important; color: var(--oscuro) !important; }
+
+    .vuelto-ok  { color: #27ae60; font-weight: 600; font-size: 14px; margin: 4px 0; }
+    .vuelto-falta { color: var(--rojo); font-weight: 600; font-size: 14px; margin: 4px 0; }
+
+    /* ───────── BANCO INFO ───────── */
+    .banco-info {
+      background: #f0f7ff; border: 1px solid #b3d4f5;
+      border-radius: 10px; padding: 10px 14px;
+      font-size: 13px; color: #1a3c5e; margin-top: 6px; display: none;
+    }
+    .banco-info .banco-nombre { font-weight: 800; margin-bottom: 2px; }
+    .banco-info .cuenta-num { font-family: monospace; font-size: 15px; letter-spacing: 1px; color: #0056b3; }
+
+    /* ───────── CONFIRMAR ───────── */
+    .btn-confirmar {
+      width: 100%; padding: 14px; font-size: 16px;
+      margin-top: 10px; border-radius: 12px;
+    }
+    .btn-confirmar:disabled { opacity: .6; cursor: not-allowed; }
+    .alerta-error {
+      background: #fff0f0; border: 1px solid var(--rojo);
+      color: var(--rojo-dark); border-radius: 10px;
+      padding: 10px 14px; margin: 6px 0;
+      font-size: 13px; display: none; font-weight: 600;
+    }
+
+    /* ───────── OVERLAY FACTURA ───────── */
+    .overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,.65);
+      display: none; justify-content: center; align-items: center; z-index: 1000;
+      padding: 16px;
+    }
+    .factura {
+      background: white; padding: 20px; width: 100%;
+      max-width: 460px; max-height: 88vh;
+      overflow-y: auto; border-radius: 16px;
+    }
+    .factura-btns { display: flex; gap: 10px; margin-top: 14px; flex-wrap: wrap; }
+
+    /* ───────── MODAL CRÉDITO ───────── */
+    .modal-credito {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,.65);
+      display: none; justify-content: center; align-items: center; z-index: 1100;
+      padding: 16px;
+    }
+    .modal-credito-box {
+      background: white; padding: 24px; width: 100%;
+      max-width: 340px; border-radius: 16px;
+    }
+    .modal-credito-box h3 { margin-bottom: 16px; font-size: 17px; }
+    .modal-credito-box .btns { display: flex; gap: 10px; margin-top: 12px; }
+    .modal-credito-box .btns button.cancel { background: #aaa; }
+
+    /* ───────── SCANNER ───────── */
+    .scan-btn {
+      display: none; /* sólo móvil */
+      width: 44px; height: 44px; padding: 0;
+      align-items: center; justify-content: center;
+      font-size: 20px; flex-shrink: 0;
+      border-radius: 10px;
+    }
+    .buscar-row {
+      display: flex; gap: 8px; align-items: center;
+    }
+    .buscar-row input { margin: 0; flex: 1; }
+
+    .scanner-modal {
+      position: fixed; inset: 0; background: #000;
+      z-index: 2000; display: none;
+      flex-direction: column;
+    }
+    .scanner-modal.activo { display: flex; }
+    #scanner-container { flex: 1; position: relative; overflow: hidden; }
+    #scanner-container video { width: 100%; height: 100%; object-fit: cover; }
+    #scanner-container canvas.drawingBuffer { display: none; }
+    .scanner-overlay {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      pointer-events: none;
+    }
+    .scan-frame {
+      width: 260px; height: 160px;
+      border: 3px solid var(--verde);
+      border-radius: 16px;
+      box-shadow: 0 0 0 9999px rgba(0,0,0,.45);
+      animation: pulse-border 1.5s ease-in-out infinite;
+    }
+    @keyframes pulse-border {
+      0%,100% { border-color: var(--verde); }
+      50%     { border-color: #fff; }
+    }
+    .scan-line {
+      position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 240px; height: 2px;
+      background: rgba(255,60,52,.8);
+      animation: scan-move 2s linear infinite;
+    }
+    @keyframes scan-move {
+      0%   { margin-top: -70px; }
+      50%  { margin-top:  70px; }
+      100% { margin-top: -70px; }
+    }
+    .scan-hint { color: white; font-size: 14px; font-weight: 700; margin-top: 20px; text-align: center; }
+    .scanner-close {
+      position: absolute; top: 50px; right: 20px;
+      width: 44px; height: 44px;
+      background: rgba(255,255,255,.2); border: none;
+      color: white; font-size: 22px; border-radius: 50%;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      pointer-events: all;
+    }
+    .scanner-footer {
+      background: #111; padding: 16px 20px;
+      display: flex; justify-content: center;
+    }
+    .scanner-footer button {
+      background: #ff3f34; padding: 12px 30px; font-size: 15px; border-radius: 12px;
+    }
+    #scan-result-bar {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      background: var(--verde); color: var(--oscuro);
+      font-weight: 800; font-size: 15px;
+      padding: 12px 20px; text-align: center;
+      display: none; pointer-events: all;
+    }
+
+    /* ───────── SPINNER ───────── */
     .spinner {
       display: inline-block; width: 16px; height: 16px;
-      border: 2px solid rgba(255,255,255,0.4); border-top-color: white;
-      border-radius: 50%; animation: spin 0.6s linear infinite;
+      border: 2px solid rgba(255,255,255,.4); border-top-color: white;
+      border-radius: 50%; animation: spin .6s linear infinite;
       vertical-align: middle; margin-right: 6px;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
-    .btn-confirmar { width: 100%; padding: 10px; font-size: 16px; margin-top: 8px; }
-    .btn-confirmar:disabled { opacity: 0.6; cursor: not-allowed; }
-    .alerta-error {
-      background: #fff0f0; border: 1px solid #ff3f34;
-      color: #c0392b; border-radius: 6px; padding: 8px 12px;
-      margin: 6px 0; font-size: 13px; display: none;
+
+    /* ───────── RESPONSIVE ───────── */
+    @media (max-width: 768px) {
+      .sidebar { display: none; }
+      .topbar  { display: flex; }
+      .main    { margin-left: 0; padding-top: 56px; }
+      .header  { display: none; }
+      .contenido { flex-direction: column; padding: 12px; gap: 12px; }
+      .scan-btn  { display: flex; }
     }
-    .banco-info {
-      background: #f0f7ff; border: 1px solid #b3d4f5;
-      border-radius: 8px; padding: 8px 12px;
-      font-size: 13px; color: #1a3c5e; margin-top: 6px; display: none;
+
+    @media (max-width: 480px) {
+      .card { padding: 14px; }
+      .btn-confirmar { padding: 16px; font-size: 17px; }
+      .total-line { font-size: 22px; }
     }
-    .banco-info .banco-nombre { font-weight: bold; margin-bottom: 2px; }
-    .banco-info .cuenta-num { font-family: monospace; font-size: 15px; letter-spacing: 1px; color: #0056b3; }
+
+    /* cantidad en carrito */
+    .qty-ctrl { display: flex; align-items: center; gap: 6px; }
+    .qty-ctrl button {
+      width: 28px; height: 28px; padding: 0;
+      font-size: 16px; line-height: 1; border-radius: 8px;
+      background: #f0f0f0; color: #333;
+    }
+    .qty-ctrl button:hover { background: #ddd; }
+    .qty-val { font-weight: 800; min-width: 20px; text-align: center; }
   </style>
 </head>
 <body>
 
+<!-- SIDEBAR (desktop) -->
 <div class="sidebar">
   <h2>FIVI</h2>
-  <a href="index.html">💰 Venta</a>
+  <a href="index.html" class="activa">💰 Venta</a>
   <a href="bodega.html">📦 Bodega</a>
   <a href="deuda.html">💸 Deudas</a>
   <a href="analisis.html">🔍 Historial</a>
@@ -85,20 +337,62 @@
   <a href="cliente.html">👤 Clientes</a>
 </div>
 
+<!-- TOPBAR (móvil) -->
+<div class="topbar">
+  <button onclick="abrirDrawer()" aria-label="Menú">☰</button>
+  <span class="topbar-title">🛒 Ventas</span>
+  <button onclick="abrirScanner()" aria-label="Escanear">📷</button>
+</div>
+
+<!-- DRAWER (móvil) -->
+<div class="drawer-overlay" id="drawerOverlay" onclick="cerrarDrawer()"></div>
+<div class="drawer" id="drawer">
+  <h2>FIVI</h2>
+  <a href="index.html" onclick="cerrarDrawer()">💰 Venta</a>
+  <a href="bodega.html">📦 Bodega</a>
+  <a href="deuda.html">💸 Deudas</a>
+  <a href="analisis.html">🔍 Historial</a>
+  <a href="caja.html">💵 Caja</a>
+  <a href="cliente.html">👤 Clientes</a>
+</div>
+
+<!-- SCANNER MODAL -->
+<div class="scanner-modal" id="scannerModal">
+  <div id="scanner-container">
+    <div class="scanner-overlay">
+      <div class="scan-frame">
+        <div class="scan-line"></div>
+      </div>
+      <div class="scan-hint">Apunta el código de barras al recuadro</div>
+    </div>
+    <div id="scan-result-bar"></div>
+    <button class="scanner-close" onclick="cerrarScanner()">✕</button>
+  </div>
+  <div class="scanner-footer">
+    <button onclick="cerrarScanner()">Cerrar escáner</button>
+  </div>
+</div>
+
+<!-- MAIN -->
 <div class="main">
   <div class="header">🛒 Ventas</div>
   <div class="contenido">
 
+    <!-- Buscar producto -->
     <div class="card">
-      <h3 style="margin:0 0 10px">Buscar producto</h3>
-      <input id="buscar" placeholder="Nombre o código..." oninput="filtrar()">
+      <h3>Buscar producto</h3>
+      <div class="buscar-row">
+        <input id="buscar" placeholder="Nombre o código..." oninput="filtrar()" autocomplete="off">
+        <button class="scan-btn" onclick="abrirScanner()" title="Escanear código">📷</button>
+      </div>
       <ul id="lista"></ul>
     </div>
 
+    <!-- Nueva venta -->
     <div class="card">
-      <h3 style="margin:0 0 10px">Nueva venta</h3>
-      <input id="cliente" placeholder="Cliente *">
-      <input id="cedula" placeholder="Cédula">
+      <h3>Nueva venta</h3>
+      <input id="cliente" placeholder="Cliente *" autocomplete="off">
+      <input id="cedula" placeholder="Cédula" autocomplete="off">
       <input id="celular" placeholder="Celular" type="tel">
       <input id="correo" placeholder="Correo electrónico" type="email">
       <input id="descuento" type="number" placeholder="Descuento % (0–100)" min="0" max="100" step="0.01" oninput="clampDescuento(); actualizar()">
@@ -114,13 +408,11 @@
         <button onclick="setTipo('transferencia')" id="btnT">Transferencia</button>
       </div>
 
-      <!-- Sección efectivo -->
       <div id="seccionEfectivo">
         <input id="montoRecibido" type="number" placeholder="Monto recibido" oninput="calcularVuelto()" min="0">
         <p id="vueltoTxt" class="vuelto-ok">Vuelto: $0.00</p>
       </div>
 
-      <!-- Sección transferencia -->
       <div id="seccionTransferencia" style="display:none">
         <select id="bancoPicker" onchange="mostrarBanco()">
           <option value="">— Selecciona banco —</option>
@@ -148,7 +440,7 @@
 </div>
 
 <!-- Modal: factura -->
-<div class="overlay" id="overlay">
+<div class="overlay" id="overlay" style="display:none">
   <div class="factura">
     <div id="facturaContenido"></div>
     <div class="factura-btns">
@@ -175,9 +467,8 @@
 
 <script>
 const API = "https://bazar-bellita.onrender.com";
-
 const bancos = {
-  guayaquil: { nombre: "Banco Guayaquil", cuenta: "0000000000" },
+  guayaquil: { nombre: "Banco Guayaquil", cuenta: "10706658" },
   pichincha:  { nombre: "Banco Pichincha", cuenta: "2208028078" }
 };
 
@@ -185,17 +476,119 @@ let productos = [];
 let carrito = [];
 let tipoPago = "efectivo";
 let resolveCredito = null;
+let scannerActivo = false;
 
-document.addEventListener("DOMContentLoaded", () => {
-  document.getElementById("cedula").addEventListener("input", buscarCliente);
-  cargar();
-});
+// ── Drawer ──
+function abrirDrawer() {
+  document.getElementById("drawer").classList.add("open");
+  document.getElementById("drawerOverlay").style.display = "block";
+}
+function cerrarDrawer() {
+  document.getElementById("drawer").classList.remove("open");
+  document.getElementById("drawerOverlay").style.display = "none";
+}
 
+// ── SCANNER ──
+function abrirScanner() {
+  const modal = document.getElementById("scannerModal");
+  modal.classList.add("activo");
+  document.getElementById("scan-result-bar").style.display = "none";
+
+  Quagga.init({
+    inputStream: {
+      name: "Live",
+      type: "LiveStream",
+      target: document.getElementById("scanner-container"),
+      constraints: {
+        facingMode: "environment",
+        width: { ideal: 1280 },
+        height: { ideal: 720 }
+      }
+    },
+    decoder: {
+      readers: [
+        "ean_reader", "ean_8_reader", "code_128_reader",
+        "code_39_reader", "upc_reader", "upc_e_reader"
+      ]
+    },
+    locate: true
+  }, function(err) {
+    if (err) {
+      console.error("Quagga init error:", err);
+      cerrarScanner();
+      alert("No se pudo acceder a la cámara. Verifica los permisos.");
+      return;
+    }
+    Quagga.start();
+    scannerActivo = true;
+  });
+
+  Quagga.onDetected(onCodigoDetectado);
+}
+
+function onCodigoDetectado(result) {
+  const code = result.codeResult.code;
+  if (!code) return;
+
+  // vibrar si disponible
+  if (navigator.vibrate) navigator.vibrate(80);
+
+  const bar = document.getElementById("scan-result-bar");
+  bar.textContent = `✅ Código: ${code}`;
+  bar.style.display = "block";
+
+  // Buscar en productos
+  const prod = productos.find(p =>
+    (p.codigo || "").toLowerCase() === code.toLowerCase()
+  );
+
+  setTimeout(() => {
+    cerrarScanner();
+    if (prod) {
+      document.getElementById("buscar").value = prod.nombre;
+      filtrar();
+      // agregar 1 unidad directamente
+      agregarDirecto(prod._id);
+    } else {
+      // poner código en búsqueda manual
+      document.getElementById("buscar").value = code;
+      filtrar();
+      mostrarAlerta(`Código ${code} no encontrado. Búsqueda manual activa.`);
+    }
+  }, 900);
+}
+
+function cerrarScanner() {
+  if (scannerActivo) {
+    Quagga.offDetected(onCodigoDetectado);
+    Quagga.stop();
+    scannerActivo = false;
+  }
+  document.getElementById("scannerModal").classList.remove("activo");
+  document.getElementById("scan-result-bar").style.display = "none";
+}
+
+// agregar sin prompt cuando viene del scanner (cantidad 1, luego puede modificar)
+function agregarDirecto(id) {
+  const p = productos.find(x => x._id === id);
+  if (!p) return;
+  if (p.stock <= 0) return mostrarAlerta(`Sin stock: ${p.nombre}`);
+  const existe = carrito.find(x => x.id === id);
+  if (existe) {
+    if (existe.cantidad >= p.stock) return mostrarAlerta(`Stock máximo alcanzado: ${p.stock}`);
+    existe.cantidad += 1;
+  } else {
+    carrito.push({ id, nombre: p.nombre, precio: Number(p.precioVenta), cantidad: 1 });
+  }
+  actualizar();
+}
+
+// ── Tipo pago ──
 function setTipo(tipo) {
   tipoPago = tipo;
-  document.getElementById("btnE").classList.toggle("activo", tipo === "efectivo");
-  document.getElementById("btnC").classList.toggle("activo", tipo === "credito");
-  document.getElementById("btnT").classList.toggle("activo", tipo === "transferencia");
+  ["btnE","btnC","btnT"].forEach((id,i) =>
+    document.getElementById(id).classList.toggle("activo", ["efectivo","credito","transferencia"][i] === tipo)
+  );
   document.getElementById("seccionEfectivo").style.display      = tipo === "efectivo"     ? "block" : "none";
   document.getElementById("seccionTransferencia").style.display = tipo === "transferencia" ? "block" : "none";
   if (tipo !== "efectivo") {
@@ -246,6 +639,11 @@ function calcularVuelto() {
   }
 }
 
+document.addEventListener("DOMContentLoaded", () => {
+  document.getElementById("cedula").addEventListener("input", buscarCliente);
+  cargar();
+});
+
 async function buscarCliente() {
   const cedula = document.getElementById("cedula").value.trim();
   if (!cedula) return;
@@ -258,7 +656,7 @@ async function buscarCliente() {
       document.getElementById("celular").value = data.telefono || "";
       document.getElementById("correo").value  = data.correo || "";
     }
-  } catch (err) { console.error("Error buscando cliente:", err); }
+  } catch (err) { console.error(err); }
 }
 
 async function cargar() {
@@ -270,7 +668,6 @@ async function cargar() {
     productos = data;
   } catch (err) {
     mostrarAlerta("Error cargando productos. Verifica la conexión.");
-    console.error("cargar():", err);
   }
 }
 
@@ -291,13 +688,16 @@ async function guardarClienteSiNoExiste() {
         body: JSON.stringify({ nombre, cedula, telefono, correo })
       });
     }
-  } catch (err) { console.error("Error guardando cliente:", err); }
+  } catch (err) { console.error(err); }
 }
 
 function mostrar(lista) {
   document.getElementById("lista").innerHTML = lista.map(p => `
     <li>
-      <span>${p.nombre} <small style="color:#888">$${Number(p.precioVenta).toFixed(2)} · Stock: ${p.stock}</small></span>
+      <div class="info">
+        <span>${p.nombre}</span>
+        <small>$${Number(p.precioVenta).toFixed(2)} · Stock: ${p.stock}</small>
+      </div>
       <button onclick="agregar('${p._id}')">+ Agregar</button>
     </li>
   `).join("");
@@ -311,7 +711,7 @@ function filtrar() {
     (p.codigo || "").toLowerCase().includes(t)
   );
   if (f.length === 0) {
-    document.getElementById("lista").innerHTML = "<li style='color:#888;padding:8px 0'>No hay productos</li>";
+    document.getElementById("lista").innerHTML = "<li style='color:#aaa;padding:10px 0;font-size:13px'>Sin resultados</li>";
     return;
   }
   mostrar(f);
@@ -334,6 +734,17 @@ function agregar(id) {
   actualizar();
 }
 
+function cambiarCantidad(id, delta) {
+  const item = carrito.find(x => x.id === id);
+  if (!item) return;
+  const prod = productos.find(x => x._id === id);
+  const maxStock = prod ? prod.stock : 9999;
+  item.cantidad += delta;
+  if (item.cantidad <= 0) { carrito = carrito.filter(x => x.id !== id); }
+  else if (item.cantidad > maxStock) { item.cantidad = maxStock; mostrarAlerta(`Stock máximo: ${maxStock}`); }
+  actualizar();
+}
+
 function actualizar() {
   const subtotal = carrito.reduce((s, p) => s + p.precio * p.cantidad, 0);
   const pct = Math.min(Math.max(parseFloat(document.getElementById("descuento").value) || 0, 0), 100);
@@ -342,12 +753,22 @@ function actualizar() {
   document.getElementById("total").textContent = totalFinal.toFixed(2);
   document.getElementById("descuentoPreview").textContent = pct > 0
     ? `Subtotal: $${subtotal.toFixed(2)} — Descuento: -$${descuentoMonto.toFixed(2)}` : "";
-  document.getElementById("carrito").innerHTML = carrito.map(p => `
-    <li>
-      <span>${p.nombre} x${p.cantidad} = <b>$${(p.precio * p.cantidad).toFixed(2)}</b></span>
-      <button onclick="eliminarProducto('${p.id}')" style="background:#e74c3c;padding:4px 8px">❌</button>
-    </li>
-  `).join("") || "<li style='color:#aaa;font-size:13px;padding:6px 0'>Carrito vacío</li>";
+
+  document.getElementById("carrito").innerHTML = carrito.length === 0
+    ? "<li style='color:#aaa;font-size:13px;padding:8px 0'>Carrito vacío</li>"
+    : carrito.map(p => `
+      <li>
+        <div class="info">
+          <span>${p.nombre}</span>
+          <small>$${p.precio.toFixed(2)} c/u = <b>$${(p.precio * p.cantidad).toFixed(2)}</b></small>
+        </div>
+        <div class="qty-ctrl">
+          <button onclick="cambiarCantidad('${p.id}', -1)">−</button>
+          <span class="qty-val">${p.cantidad}</span>
+          <button onclick="cambiarCantidad('${p.id}', 1)">+</button>
+        </div>
+      </li>
+    `).join("");
   calcularVuelto();
 }
 
@@ -437,7 +858,6 @@ async function facturar() {
 
   await guardarClienteSiNoExiste();
 
-  // ---- Factura HTML ----
   let html = `
     <style>
       @media print {
@@ -479,9 +899,6 @@ async function facturar() {
   document.getElementById("overlay").style.display = "flex";
 
   try {
-    // ✅ UNA SOLA llamada: el backend se encarga de registrar
-    //    la transferencia en caja internamente si tipo === "transferencia"
-    //    NO llamamos a /caja/transferencia por separado (eso causaba el duplicado)
     const resVenta = await fetch(`${API}/ventas`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -496,10 +913,6 @@ async function facturar() {
     });
     if (!resVenta.ok) throw new Error("HTTP " + resVenta.status);
 
-    // ❌ ELIMINADO: ya no llamamos a /caja/transferencia por separado
-    // Esto era lo que causaba el duplicado (111 en ventas + 111 en caja = 222)
-
-    // Descontar stock
     const resultadosStock = await Promise.allSettled(
       carrito.map(p => fetch(`${API}/productos/vender/${p.id}`, {
         method: "PUT",
@@ -509,7 +922,7 @@ async function facturar() {
     );
     const fallos = resultadosStock.filter(r => r.status === "rejected" || (r.value && !r.value.ok));
     if (fallos.length > 0) {
-      mostrarAlerta(`⚠️ Venta guardada, pero ${fallos.length} producto(s) no actualizaron stock. Revisar bodega.`);
+      mostrarAlerta(`⚠️ Venta guardada, pero ${fallos.length} producto(s) no actualizaron stock.`);
     }
 
     limpiarFormulario();
