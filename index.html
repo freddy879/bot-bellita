@@ -1,571 +1,546 @@
 <!DOCTYPE html>
-<html lang="es">
+<html>
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-<title>BellitaBot — Asistente IA</title>
-
-<style>
-
-@import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
-
-:root{
-  --rosa:#e8608a;
-  --rosa-dark:#c0476d;
-  --rosa-light:#fde8f1;
-  --dorado:#d4a847;
-  --bg:#fcf7fa;
-  --surface:#ffffff;
-  --border:#f1dce7;
-  --text:#2b1b24;
-  --muted:#8c7482;
-  --verde:#3ba06f;
-  --radius:18px;
-  --font:'Sora',sans-serif;
-}
-
-*{
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
-}
-
-body{
-  font-family:var(--font);
-  background:var(--bg);
-  color:var(--text);
-  height:100vh;
-  display:flex;
-  flex-direction:column;
-  overflow:hidden;
-}
-
-/* HEADER */
-
-header{
-  background:var(--surface);
-  border-bottom:1px solid var(--border);
-  padding:16px 22px;
-  display:flex;
-  align-items:center;
-  gap:14px;
-}
-
-.logo{
-  width:44px;
-  height:44px;
-  border-radius:14px;
-  background:linear-gradient(135deg,var(--rosa),var(--dorado));
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:20px;
-}
-
-.header-info h1{
-  font-size:16px;
-  font-weight:600;
-}
-
-.header-info p{
-  font-size:12px;
-  color:var(--muted);
-}
-
-.status{
-  margin-left:auto;
-  width:10px;
-  height:10px;
-  border-radius:50%;
-  background:var(--verde);
-  box-shadow:0 0 0 5px rgba(59,160,111,.15);
-  animation:pulse 2s infinite;
-}
-
-@keyframes pulse{
-  0%,100%{
-    box-shadow:0 0 0 5px rgba(59,160,111,.15);
-  }
-  50%{
-    box-shadow:0 0 0 10px rgba(59,160,111,.05);
-  }
-}
-
-/* SUGGESTIONS */
-
-.suggestions{
-  padding:16px 20px 0;
-  display:flex;
-  gap:8px;
-  flex-wrap:wrap;
-}
-
-.suggestions button{
-  border:none;
-  background:var(--surface);
-  border:1px solid var(--border);
-  color:var(--rosa-dark);
-  border-radius:999px;
-  padding:8px 14px;
-  cursor:pointer;
-  font-size:12px;
-  font-family:var(--font);
-  font-weight:500;
-  transition:.2s;
-}
-
-.suggestions button:hover{
-  background:var(--rosa-light);
-  border-color:var(--rosa);
-}
-
-/* CHAT */
-
-#messages{
-  flex:1;
-  overflow-y:auto;
-  padding:20px;
-  display:flex;
-  flex-direction:column;
-  gap:18px;
-}
-
-.msg{
-  display:flex;
-  gap:10px;
-  max-width:82%;
-}
-
-.msg.user{
-  align-self:flex-end;
-  flex-direction:row-reverse;
-}
-
-.msg.bot{
-  align-self:flex-start;
-}
-
-.avatar{
-  width:34px;
-  height:34px;
-  border-radius:12px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  flex-shrink:0;
-}
-
-.msg.bot .avatar{
-  background:linear-gradient(135deg,var(--rosa),var(--dorado));
-}
-
-.msg.user .avatar{
-  background:#e9dfea;
-}
-
-.bubble{
-  padding:14px 16px;
-  border-radius:18px;
-  line-height:1.7;
-  font-size:14px;
-}
-
-.msg.bot .bubble{
-  background:var(--surface);
-  border:1px solid var(--border);
-  border-bottom-left-radius:4px;
-}
-
-.msg.user .bubble{
-  background:linear-gradient(135deg,var(--rosa),var(--rosa-dark));
-  color:white;
-  border-bottom-right-radius:4px;
-}
-
-.typing .bubble{
-  display:flex;
-  gap:5px;
-  align-items:center;
-}
-
-.typing span{
-  width:7px;
-  height:7px;
-  border-radius:50%;
-  background:#999;
-  animation:bounce .9s infinite;
-}
-
-.typing span:nth-child(2){
-  animation-delay:.2s;
-}
-
-.typing span:nth-child(3){
-  animation-delay:.4s;
-}
-
-@keyframes bounce{
-  0%,80%,100%{
-    transform:translateY(0);
-  }
-  40%{
-    transform:translateY(-6px);
-  }
-}
-
-/* INPUT */
-
-.input-area{
-  background:var(--surface);
-  border-top:1px solid var(--border);
-  padding:14px 20px 18px;
-  display:flex;
-  gap:10px;
-}
-
-#user-input{
-  flex:1;
-  resize:none;
-  border:none;
-  outline:none;
-  background:var(--bg);
-  border:1px solid var(--border);
-  border-radius:14px;
-  padding:13px 15px;
-  font-size:14px;
-  font-family:var(--font);
-  max-height:120px;
-}
-
-#user-input:focus{
-  border-color:var(--rosa);
-}
-
-#send-btn{
-  width:46px;
-  height:46px;
-  border:none;
-  border-radius:14px;
-  background:linear-gradient(135deg,var(--rosa),var(--rosa-dark));
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  cursor:pointer;
-}
-
-#send-btn svg{
-  width:18px;
-  height:18px;
-  stroke:white;
-}
-
-::-webkit-scrollbar{
-  width:5px;
-}
-
-::-webkit-scrollbar-thumb{
-  background:var(--border);
-  border-radius:999px;
-}
-
-</style>
+  <title>Ventas - Bazar Bellita</title>
+  <style>
+    body { margin: 0; font-family: 'Segoe UI'; display: flex; background: #f5f6fa; }
+    .sidebar { width: 220px; background: #1e272e; color: white; height: 100vh; padding: 20px; box-sizing: border-box; }
+    .sidebar a { display: block; color: white; padding: 10px; text-decoration: none; margin-top: 10px; border-radius: 8px; }
+    .sidebar a:hover { background: #485460; }
+    .main { flex: 1; overflow-y: auto; }
+    .header { background: #ff3f34; color: white; padding: 15px; font-size: 20px; }
+    .contenido { padding: 20px; display: flex; gap: 20px; }
+    .card { background: white; padding: 15px; border-radius: 12px; flex: 1; }
+    input[type="text"], input[type="number"], input[type="email"], input[type="tel"], input:not([type]) {
+      padding: 8px; margin: 5px 0; width: 100%; box-sizing: border-box; border: 1px solid #ddd; border-radius: 6px;
+    }
+    select {
+      padding: 8px; margin: 5px 0; width: 100%; box-sizing: border-box;
+      border: 1px solid #ddd; border-radius: 6px; font-family: 'Segoe UI'; font-size: 14px;
+    }
+    button { padding: 8px 12px; border: none; background: #ff3f34; color: white; border-radius: 6px; cursor: pointer; }
+    button:hover { background: #e03329; }
+    ul { list-style: none; padding: 0; margin: 0; }
+    .overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.6); display: none;
+      justify-content: center; align-items: center; z-index: 1000;
+    }
+    .factura { background: white; padding: 20px; width: 420px; max-height: 80vh; overflow-y: auto; border-radius: 10px; }
+    .factura-btns { display: flex; gap: 10px; margin-top: 12px; }
+    .modal-credito {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.6); display: none;
+      justify-content: center; align-items: center; z-index: 1100;
+    }
+    .modal-credito-box { background: white; padding: 24px; width: 320px; border-radius: 10px; }
+    .modal-credito-box h3 { margin: 0 0 16px; }
+    .modal-credito-box input, .modal-credito-box select { margin-bottom: 10px; }
+    .modal-credito-box .btns { display: flex; gap: 10px; margin-top: 8px; }
+    .modal-credito-box .btns button.cancel { background: #888; }
+    .pagoBtn { display: flex; gap: 6px; margin: 8px 0; flex-wrap: wrap; }
+    .pagoBtn button { flex: 1; min-width: 80px; }
+    .activo { background: #2ed573 !important; color: #1e272e !important; }
+    .vuelto-ok { color: #27ae60; font-weight: 500; }
+    .vuelto-falta { color: #ff3f34; font-weight: 500; }
+    #carrito li { display: flex; align-items: center; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #f0f0f0; }
+    #carrito li:last-child { border-bottom: none; }
+    #lista li { display: flex; align-items: center; justify-content: space-between; padding: 6px 4px; border-bottom: 1px solid #f5f5f5; font-size: 14px; }
+    #lista li:last-child { border-bottom: none; }
+    #lista li button { padding: 4px 10px; font-size: 13px; }
+    .total-line { font-size: 18px; font-weight: 600; margin: 10px 0 4px; }
+    .descuento-preview { font-size: 13px; color: #888; margin: 0 0 8px; }
+    .spinner {
+      display: inline-block; width: 16px; height: 16px;
+      border: 2px solid rgba(255,255,255,0.4); border-top-color: white;
+      border-radius: 50%; animation: spin 0.6s linear infinite;
+      vertical-align: middle; margin-right: 6px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .btn-confirmar { width: 100%; padding: 10px; font-size: 16px; margin-top: 8px; }
+    .btn-confirmar:disabled { opacity: 0.6; cursor: not-allowed; }
+    .alerta-error {
+      background: #fff0f0; border: 1px solid #ff3f34;
+      color: #c0392b; border-radius: 6px; padding: 8px 12px;
+      margin: 6px 0; font-size: 13px; display: none;
+    }
+    .banco-info {
+      background: #f0f7ff; border: 1px solid #b3d4f5;
+      border-radius: 8px; padding: 8px 12px;
+      font-size: 13px; color: #1a3c5e; margin-top: 6px; display: none;
+    }
+    .banco-info .banco-nombre { font-weight: bold; margin-bottom: 2px; }
+    .banco-info .cuenta-num { font-family: monospace; font-size: 15px; letter-spacing: 1px; color: #0056b3; }
+  </style>
 </head>
-
 <body>
 
-<header>
-
-  <div class="logo">🛍️</div>
-
-  <div class="header-info">
-    <h1>BellitaBot</h1>
-    <p>Asistente inteligente de Bazar Bellita</p>
-  </div>
-
-  <div class="status"></div>
-
-</header>
-
-<div class="suggestions">
-
-  <button onclick="suggest('¿Cuáles fueron las ventas de hoy?')">
-    📊 Ventas
-  </button>
-
-  <button onclick="suggest('¿Qué productos son más rentables?')">
-    💰 Rentabilidad
-  </button>
-
-  <button onclick="suggest('¿Qué productos tienen baja rotación?')">
-    📦 Inventario
-  </button>
-
-  <button onclick="suggest('¿Cómo puedo vender más?')">
-    🚀 Estrategias
-  </button>
-
+<div class="sidebar">
+  <h2>FIVI</h2>
+  <a href="index.html">💰 Venta</a>
+  <a href="bodega.html">📦 Bodega</a>
+  <a href="deuda.html">💸 Deudas</a>
+  <a href="analisis.html">🔍 Historial</a>
+  <a href="caja.html">💵 Caja</a>
+  <a href="cliente.html">👤 Clientes</a>
 </div>
 
-<div id="messages"></div>
+<div class="main">
+  <div class="header">🛒 Ventas</div>
+  <div class="contenido">
 
-<div class="input-area">
+    <div class="card">
+      <h3 style="margin:0 0 10px">Buscar producto</h3>
+      <input id="buscar" placeholder="Nombre o código..." oninput="filtrar()">
+      <ul id="lista"></ul>
+    </div>
 
-  <textarea
-    id="user-input"
-    rows="1"
-    placeholder="Pregúntame sobre ventas, productos o crecimiento..."
-  ></textarea>
+    <div class="card">
+      <h3 style="margin:0 0 10px">Nueva venta</h3>
+      <input id="cliente" placeholder="Cliente *">
+      <input id="cedula" placeholder="Cédula">
+      <input id="celular" placeholder="Celular" type="tel">
+      <input id="correo" placeholder="Correo electrónico" type="email">
+      <input id="descuento" type="number" placeholder="Descuento % (0–100)" min="0" max="100" step="0.01" oninput="clampDescuento(); actualizar()">
 
-  <button id="send-btn" onclick="sendMessage()">
+      <ul id="carrito"></ul>
 
-    <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
-      <line x1="22" y1="2" x2="11" y2="13"/>
-      <polygon points="22 2 15 22 11 13 2 9 22 2"/>
-    </svg>
+      <div class="total-line">Total: $<span id="total">0.00</span></div>
+      <div class="descuento-preview" id="descuentoPreview"></div>
 
-  </button>
+      <div class="pagoBtn">
+        <button onclick="setTipo('efectivo')" id="btnE" class="activo">Efectivo</button>
+        <button onclick="setTipo('credito')" id="btnC">Crédito</button>
+        <button onclick="setTipo('transferencia')" id="btnT">Transferencia</button>
+      </div>
 
+      <!-- Sección efectivo -->
+      <div id="seccionEfectivo">
+        <input id="montoRecibido" type="number" placeholder="Monto recibido" oninput="calcularVuelto()" min="0">
+        <p id="vueltoTxt" class="vuelto-ok">Vuelto: $0.00</p>
+      </div>
+
+      <!-- Sección transferencia -->
+      <div id="seccionTransferencia" style="display:none">
+        <select id="bancoPicker" onchange="mostrarBanco()">
+          <option value="">— Selecciona banco —</option>
+          <option value="guayaquil">🟦 Banco Guayaquil</option>
+          <option value="pichincha">🟨 Banco Pichincha</option>
+        </select>
+        <div class="banco-info" id="infoGuayaquil">
+          <div class="banco-nombre">🟦 Banco Guayaquil</div>
+          <div>Cuenta de Ahorros</div>
+          <div class="cuenta-num">10706658</div>
+        </div>
+        <div class="banco-info" id="infoPichincha">
+          <div class="banco-nombre">🟨 Banco Pichincha</div>
+          <div>Cuenta de Ahorros</div>
+          <div class="cuenta-num">2208028078</div>
+        </div>
+        <input id="comprobante" type="text" placeholder="Número de comprobante *">
+      </div>
+
+      <div class="alerta-error" id="alertaError"></div>
+      <button class="btn-confirmar" id="btnConfirmar" onclick="facturar()">Confirmar venta</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- Modal: factura -->
+<div class="overlay" id="overlay">
+  <div class="factura">
+    <div id="facturaContenido"></div>
+    <div class="factura-btns">
+      <button onclick="window.print()">🖨️ Imprimir</button>
+      <button onclick="cerrarFactura()" style="background:#888">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: crédito -->
+<div class="modal-credito" id="modalCredito">
+  <div class="modal-credito-box">
+    <h3>💰 Detalles del crédito</h3>
+    <label>Interés %</label>
+    <input id="inputInteres" type="number" placeholder="Ej: 10" min="0" max="100" step="0.01">
+    <label>Número de meses</label>
+    <input id="inputMeses" type="number" placeholder="Ej: 6" min="1" step="1">
+    <div class="btns">
+      <button onclick="confirmarCredito()">Confirmar</button>
+      <button class="cancel" onclick="cancelarCredito()">Cancelar</button>
+    </div>
+  </div>
 </div>
 
 <script>
-
-/* =====================================
-   URL DE TU SERVER PYTHON RENDER
-===================================== */
-
-const SERVER = "https://bellitabot.onrender.com";
-
-/* ===================================== */
-
-let history = [];
-
-function addMessage(role, text){
-
-  const wrap = document.createElement("div");
-
-  wrap.className = `msg ${role}`;
-
-  const avatar = document.createElement("div");
-
-  avatar.className = "avatar";
-
-  avatar.textContent = role === "bot"
-    ? "🛍️"
-    : "👤";
-
-  const bubble = document.createElement("div");
-
-  bubble.className = "bubble";
-
-  if(role === "bot"){
-
-    bubble.innerHTML = formatText(text);
-
-  }else{
-
-    bubble.textContent = text;
-
-  }
-
-  wrap.appendChild(avatar);
-
-  wrap.appendChild(bubble);
-
-  document
-    .getElementById("messages")
-    .appendChild(wrap);
-
-  scrollBottom();
-}
-
-function addBot(text){
-  addMessage("bot", text);
-}
-
-function addUser(text){
-  addMessage("user", text);
-}
-
-function suggest(text){
-
-  document.getElementById("user-input").value = text;
-
-  sendMessage();
-}
-
-function scrollBottom(){
-
-  const box = document.getElementById("messages");
-
-  box.scrollTop = box.scrollHeight;
-}
-
-function formatText(text){
-
-  return text
-    .replace(/\*\*(.*?)\*\*/g,"<strong>$1</strong>")
-    .replace(/\n/g,"<br>");
-}
-
-function showTyping(){
-
-  const wrap = document.createElement("div");
-
-  wrap.className = "msg bot typing";
-
-  wrap.id = "typing";
-
-  wrap.innerHTML = `
-    <div class="avatar">🛍️</div>
-
-    <div class="bubble">
-      <span></span>
-      <span></span>
-      <span></span>
-    </div>
-  `;
-
-  document
-    .getElementById("messages")
-    .appendChild(wrap);
-
-  scrollBottom();
-}
-
-function hideTyping(){
-
-  const el = document.getElementById("typing");
-
-  if(el) el.remove();
-}
-
-async function sendMessage(){
-
-  const input = document.getElementById("user-input");
-
-  const text = input.value.trim();
-
-  if(!text) return;
-
-  input.value = "";
-
-  addUser(text);
-
-  history.push({
-    role:"user",
-    content:text
-  });
-
-  showTyping();
-
-  try{
-
-    const response = await fetch(
-      `${SERVER}/chat`,
-      {
-        method:"POST",
-
-        headers:{
-          "Content-Type":"application/json"
-        },
-
-        body:JSON.stringify({
-          messages:history
-        })
-      }
-    );
-
-    if(!response.ok){
-
-      throw new Error(
-        `HTTP ${response.status}`
-      );
-    }
-
-    const data = await response.json();
-
-    const reply =
-      data.reply || "Sin respuesta.";
-
-    history.push({
-      role:"assistant",
-      content:reply
-    });
-
-    hideTyping();
-
-    addBot(reply);
-
-  }catch(err){
-
-    hideTyping();
-
-    addBot(
-`⚠️ Error conectando con BellitaBot.
-
-Verifica:
-• Que Render esté online
-• Que server.py funcione
-• Que la URL sea correcta
-• Que exista ANTHROPIC_API_KEY`
-    );
-
-    console.error(err);
-  }
-}
-
-/* ENTER */
-
-document
-.getElementById("user-input")
-.addEventListener("keydown",function(e){
-
-  if(
-    e.key === "Enter" &&
-    !e.shiftKey
-  ){
-
-    e.preventDefault();
-
-    sendMessage();
-  }
-});
-
-/* AUTO RESIZE */
-
-document
-.getElementById("user-input")
-.addEventListener("input",function(){
-
-  this.style.height = "auto";
-
-  this.style.height =
-    Math.min(this.scrollHeight,120)
-    + "px";
-});
-
-/* START */
-
-window.onload = () => {
-
-  addBot(
-`¡Hola! 👋
-
-Soy **BellitaBot**, el asistente IA de Bazar Bellita 🛍️
-
-Puedo ayudarte a:
-• Analizar ventas
-• Revisar productos
-• Detectar productos rentables
-• Revisar inventario
-• Recomendar estrategias
-
-¿Qué quieres consultar hoy?`
-  );
-
+const API = "https://bazar-bellita.onrender.com";
+
+const bancos = {
+  guayaquil: { nombre: "Banco Guayaquil", cuenta: "0000000000" },
+  pichincha:  { nombre: "Banco Pichincha", cuenta: "2208028078" }
 };
 
+let productos = [];
+let carrito = [];
+let tipoPago = "efectivo";
+let resolveCredito = null;
+
+document.addEventListener("DOMContentLoaded", () => {
+  document.getElementById("cedula").addEventListener("input", buscarCliente);
+  cargar();
+});
+
+function setTipo(tipo) {
+  tipoPago = tipo;
+  document.getElementById("btnE").classList.toggle("activo", tipo === "efectivo");
+  document.getElementById("btnC").classList.toggle("activo", tipo === "credito");
+  document.getElementById("btnT").classList.toggle("activo", tipo === "transferencia");
+  document.getElementById("seccionEfectivo").style.display      = tipo === "efectivo"     ? "block" : "none";
+  document.getElementById("seccionTransferencia").style.display = tipo === "transferencia" ? "block" : "none";
+  if (tipo !== "efectivo") {
+    document.getElementById("montoRecibido").value = "";
+    document.getElementById("vueltoTxt").textContent = "Vuelto: $0.00";
+  }
+  if (tipo !== "transferencia") {
+    document.getElementById("bancoPicker").value = "";
+    document.getElementById("infoGuayaquil").style.display = "none";
+    document.getElementById("infoPichincha").style.display  = "none";
+    document.getElementById("comprobante").value = "";
+  }
+}
+
+function mostrarBanco() {
+  const val = document.getElementById("bancoPicker").value;
+  document.getElementById("infoGuayaquil").style.display = val === "guayaquil" ? "block" : "none";
+  document.getElementById("infoPichincha").style.display  = val === "pichincha"  ? "block" : "none";
+}
+
+function clampDescuento() {
+  const input = document.getElementById("descuento");
+  let val = parseFloat(input.value);
+  if (isNaN(val)) return;
+  if (val < 0) input.value = 0;
+  if (val > 100) input.value = 100;
+}
+
+function calcularTotalFinal() {
+  const subtotal = carrito.reduce((s, p) => s + p.precio * p.cantidad, 0);
+  const pct = Math.min(Math.max(parseFloat(document.getElementById("descuento").value) || 0, 0), 100);
+  return subtotal * (1 - pct / 100);
+}
+
+function calcularVuelto() {
+  if (tipoPago !== "efectivo") return;
+  const totalFinal = calcularTotalFinal();
+  const pago = parseFloat(document.getElementById("montoRecibido").value) || 0;
+  const el = document.getElementById("vueltoTxt");
+  if (pago <= 0) { el.textContent = "Vuelto: $0.00"; el.className = "vuelto-ok"; return; }
+  const vuelto = pago - totalFinal;
+  if (vuelto < 0) {
+    el.textContent = `Falta: $${Math.abs(vuelto).toFixed(2)}`;
+    el.className = "vuelto-falta";
+  } else {
+    el.textContent = `Vuelto: $${vuelto.toFixed(2)}`;
+    el.className = "vuelto-ok";
+  }
+}
+
+async function buscarCliente() {
+  const cedula = document.getElementById("cedula").value.trim();
+  if (!cedula) return;
+  try {
+    const res = await fetch(`${API}/clientes/${cedula}`);
+    if (!res.ok) return;
+    const data = await res.json();
+    if (data && data.nombre) {
+      document.getElementById("cliente").value = data.nombre || "";
+      document.getElementById("celular").value = data.telefono || "";
+      document.getElementById("correo").value  = data.correo || "";
+    }
+  } catch (err) { console.error("Error buscando cliente:", err); }
+}
+
+async function cargar() {
+  try {
+    const res = await fetch(`${API}/productos`);
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    const data = await res.json();
+    if (!Array.isArray(data)) throw new Error("Respuesta inválida");
+    productos = data;
+  } catch (err) {
+    mostrarAlerta("Error cargando productos. Verifica la conexión.");
+    console.error("cargar():", err);
+  }
+}
+
+async function guardarClienteSiNoExiste() {
+  const nombre   = document.getElementById("cliente").value.trim();
+  const cedula   = document.getElementById("cedula").value.trim();
+  const telefono = document.getElementById("celular").value.trim();
+  const correo   = document.getElementById("correo").value.trim();
+  if (!cedula || !nombre) return;
+  try {
+    const res = await fetch(`${API}/clientes/${cedula}`);
+    let data = null;
+    try { data = await res.json(); } catch (_) {}
+    if (!res.ok || !data || !data.nombre) {
+      await fetch(`${API}/clientes`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ nombre, cedula, telefono, correo })
+      });
+    }
+  } catch (err) { console.error("Error guardando cliente:", err); }
+}
+
+function mostrar(lista) {
+  document.getElementById("lista").innerHTML = lista.map(p => `
+    <li>
+      <span>${p.nombre} <small style="color:#888">$${Number(p.precioVenta).toFixed(2)} · Stock: ${p.stock}</small></span>
+      <button onclick="agregar('${p._id}')">+ Agregar</button>
+    </li>
+  `).join("");
+}
+
+function filtrar() {
+  const t = document.getElementById("buscar").value.toLowerCase().trim();
+  if (!t) { document.getElementById("lista").innerHTML = ""; return; }
+  const f = productos.filter(p =>
+    (p.nombre || "").toLowerCase().includes(t) ||
+    (p.codigo || "").toLowerCase().includes(t)
+  );
+  if (f.length === 0) {
+    document.getElementById("lista").innerHTML = "<li style='color:#888;padding:8px 0'>No hay productos</li>";
+    return;
+  }
+  mostrar(f);
+}
+
+function agregar(id) {
+  const p = productos.find(x => x._id === id);
+  if (!p) return;
+  const cantStr = prompt(`Cantidad para "${p.nombre}" (stock: ${p.stock})`);
+  if (cantStr === null) return;
+  const cant = parseInt(cantStr);
+  if (!cant || cant <= 0) return alert("Cantidad inválida");
+  const existe = carrito.find(x => x.id === id);
+  const cantidadActual = existe ? existe.cantidad : 0;
+  if (cantidadActual + cant > p.stock) {
+    return alert(`Sin stock suficiente. Disponible: ${p.stock}, en carrito: ${cantidadActual}`);
+  }
+  if (existe) { existe.cantidad += cant; }
+  else { carrito.push({ id, nombre: p.nombre, precio: Number(p.precioVenta), cantidad: cant }); }
+  actualizar();
+}
+
+function actualizar() {
+  const subtotal = carrito.reduce((s, p) => s + p.precio * p.cantidad, 0);
+  const pct = Math.min(Math.max(parseFloat(document.getElementById("descuento").value) || 0, 0), 100);
+  const descuentoMonto = subtotal * (pct / 100);
+  const totalFinal = subtotal - descuentoMonto;
+  document.getElementById("total").textContent = totalFinal.toFixed(2);
+  document.getElementById("descuentoPreview").textContent = pct > 0
+    ? `Subtotal: $${subtotal.toFixed(2)} — Descuento: -$${descuentoMonto.toFixed(2)}` : "";
+  document.getElementById("carrito").innerHTML = carrito.map(p => `
+    <li>
+      <span>${p.nombre} x${p.cantidad} = <b>$${(p.precio * p.cantidad).toFixed(2)}</b></span>
+      <button onclick="eliminarProducto('${p.id}')" style="background:#e74c3c;padding:4px 8px">❌</button>
+    </li>
+  `).join("") || "<li style='color:#aaa;font-size:13px;padding:6px 0'>Carrito vacío</li>";
+  calcularVuelto();
+}
+
+function eliminarProducto(id) {
+  carrito = carrito.filter(p => p.id !== id);
+  actualizar();
+}
+
+function pedirDatosCredito() {
+  return new Promise((resolve, reject) => {
+    resolveCredito = { resolve, reject };
+    document.getElementById("inputInteres").value = "";
+    document.getElementById("inputMeses").value   = "";
+    document.getElementById("modalCredito").style.display = "flex";
+  });
+}
+
+function confirmarCredito() {
+  const tasaPct = parseFloat(document.getElementById("inputInteres").value) || 0;
+  const meses   = parseInt(document.getElementById("inputMeses").value) || 0;
+  if (meses <= 0) { alert("Ingresa un número de meses válido (mínimo 1)"); return; }
+  if (tasaPct < 0 || tasaPct > 100) { alert("El interés debe estar entre 0 y 100"); return; }
+  document.getElementById("modalCredito").style.display = "none";
+  if (resolveCredito) resolveCredito.resolve({ tasaPct, meses });
+}
+
+function cancelarCredito() {
+  document.getElementById("modalCredito").style.display = "none";
+  if (resolveCredito) resolveCredito.reject(new Error("Cancelado"));
+}
+
+function mostrarAlerta(msg) {
+  const el = document.getElementById("alertaError");
+  el.textContent = msg;
+  el.style.display = "block";
+  setTimeout(() => { el.style.display = "none"; }, 5000);
+}
+
+function cerrarFactura() {
+  document.getElementById("overlay").style.display = "none";
+}
+
+async function facturar() {
+  const cliente = document.getElementById("cliente").value.trim();
+  const cedula  = document.getElementById("cedula").value.trim();
+  const celular = document.getElementById("celular").value.trim();
+  const correo  = document.getElementById("correo").value.trim();
+
+  if (!cliente) return mostrarAlerta("El nombre del cliente es requerido.");
+  if (carrito.length === 0) return mostrarAlerta("El carrito está vacío.");
+
+  const subtotal = carrito.reduce((s, p) => s + p.precio * p.cantidad, 0);
+  const pct = Math.min(Math.max(parseFloat(document.getElementById("descuento").value) || 0, 0), 100);
+  const descuentoMonto = subtotal * (pct / 100);
+  let totalFinal = subtotal - descuentoMonto;
+
+  let tasaPct = 0, montoInteres = 0, meses = 0;
+  if (tipoPago === "credito") {
+    try {
+      const res = await pedirDatosCredito();
+      tasaPct = res.tasaPct; meses = res.meses;
+    } catch (_) { return; }
+    montoInteres = totalFinal * (tasaPct / 100);
+    totalFinal  += montoInteres;
+  }
+
+  let pago = 0, vuelto = 0;
+  if (tipoPago === "efectivo") {
+    pago = parseFloat(document.getElementById("montoRecibido").value) || 0;
+    if (pago < totalFinal) return mostrarAlerta(`Pago insuficiente. Falta $${(totalFinal - pago).toFixed(2)}`);
+    vuelto = pago - totalFinal;
+  }
+
+  let bancoKey = "", bancoNombre = "", bancoCuenta = "", comprobante = "";
+  if (tipoPago === "transferencia") {
+    bancoKey    = document.getElementById("bancoPicker").value;
+    comprobante = document.getElementById("comprobante").value.trim();
+    if (!bancoKey)    return mostrarAlerta("Selecciona un banco.");
+    if (!comprobante) return mostrarAlerta("Ingresa el número de comprobante.");
+    bancoNombre = bancos[bancoKey].nombre;
+    bancoCuenta = bancos[bancoKey].cuenta;
+  }
+
+  const btnConfirmar = document.getElementById("btnConfirmar");
+  btnConfirmar.disabled = true;
+  btnConfirmar.innerHTML = '<span class="spinner"></span>Procesando...';
+
+  await guardarClienteSiNoExiste();
+
+  // ---- Factura HTML ----
+  let html = `
+    <style>
+      @media print {
+        body * { visibility: hidden; }
+        #facturaBox, #facturaBox * { visibility: visible; }
+        #facturaBox { position: absolute; left: 0; top: 0; width: 210mm; padding: 20px; }
+      }
+      #facturaBox { font-family: Arial; width: 100%; box-sizing: border-box; }
+      #facturaBox h2 { text-align: center; margin-bottom: 10px; }
+      #facturaBox hr { border: none; border-top: 1px solid #ccc; }
+    </style>
+    <div id="facturaBox">
+      <h2>FACTURA BAZAR BELLITA</h2>
+      <p><b>Cliente:</b> ${cliente || "-"}</p>
+      <p><b>Cédula:</b> ${cedula || "-"}</p>
+      <hr>
+  `;
+  carrito.forEach(p => {
+    html += `<p>${p.nombre} x${p.cantidad} = <b>$${(p.precio * p.cantidad).toFixed(2)}</b></p>`;
+  });
+  html += `<hr><p>Subtotal: $${subtotal.toFixed(2)}</p>`;
+  if (pct > 0) html += `<p>Descuento (${pct}%): -$${descuentoMonto.toFixed(2)}</p>`;
+  if (tipoPago === "credito") {
+    html += `<p>Interés (${tasaPct}%): $${montoInteres.toFixed(2)}</p>`;
+    html += `<p>Meses: ${meses}</p>`;
+  }
+  html += `<h2>Total: $${totalFinal.toFixed(2)}</h2>`;
+  if (tipoPago === "efectivo") {
+    html += `<p>Pago: $${pago.toFixed(2)}</p><p>Vuelto: $${vuelto.toFixed(2)}</p>`;
+  }
+  if (tipoPago === "transferencia") {
+    html += `<p>Banco: ${bancoNombre}</p>`;
+    html += `<p>Cuenta: ${bancoCuenta}</p>`;
+    html += `<p>Comprobante: ${comprobante}</p>`;
+  }
+  html += `<p style="font-size:12px;color:#888;margin-top:12px">Tipo de pago: ${tipoPago}</p></div>`;
+
+  document.getElementById("facturaContenido").innerHTML = html;
+  document.getElementById("overlay").style.display = "flex";
+
+  try {
+    // ✅ UNA SOLA llamada: el backend se encarga de registrar
+    //    la transferencia en caja internamente si tipo === "transferencia"
+    //    NO llamamos a /caja/transferencia por separado (eso causaba el duplicado)
+    const resVenta = await fetch(`${API}/ventas`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        cliente, cedula, celular, correo,
+        productos: carrito, subtotal,
+        descuentoPct: pct, descuentoMonto,
+        total: totalFinal, tipo: tipoPago,
+        meses, tasaInteres: tasaPct, montoInteres, pago, vuelto,
+        banco: bancoNombre, cuenta: bancoCuenta, comprobante
+      })
+    });
+    if (!resVenta.ok) throw new Error("HTTP " + resVenta.status);
+
+    // ❌ ELIMINADO: ya no llamamos a /caja/transferencia por separado
+    // Esto era lo que causaba el duplicado (111 en ventas + 111 en caja = 222)
+
+    // Descontar stock
+    const resultadosStock = await Promise.allSettled(
+      carrito.map(p => fetch(`${API}/productos/vender/${p.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ cantidad: p.cantidad })
+      }))
+    );
+    const fallos = resultadosStock.filter(r => r.status === "rejected" || (r.value && !r.value.ok));
+    if (fallos.length > 0) {
+      mostrarAlerta(`⚠️ Venta guardada, pero ${fallos.length} producto(s) no actualizaron stock. Revisar bodega.`);
+    }
+
+    limpiarFormulario();
+    await cargar();
+
+  } catch (err) {
+    console.error("Error en facturación:", err);
+    mostrarAlerta("Error al guardar la venta. Intenta de nuevo.");
+    document.getElementById("overlay").style.display = "none";
+  } finally {
+    btnConfirmar.disabled = false;
+    btnConfirmar.innerHTML = "Confirmar venta";
+  }
+}
+
+function limpiarFormulario() {
+  carrito = [];
+  actualizar();
+  ["cliente","cedula","celular","correo","montoRecibido","descuento","comprobante"].forEach(id => {
+    document.getElementById(id).value = "";
+  });
+  document.getElementById("vueltoTxt").textContent = "Vuelto: $0.00";
+  document.getElementById("vueltoTxt").className   = "vuelto-ok";
+  document.getElementById("descuentoPreview").textContent = "";
+  document.getElementById("lista").innerHTML = "";
+  document.getElementById("buscar").value    = "";
+  document.getElementById("bancoPicker").value = "";
+  document.getElementById("infoGuayaquil").style.display = "none";
+  document.getElementById("infoPichincha").style.display  = "none";
+  setTipo("efectivo");
+}
 </script>
 
 </body>
