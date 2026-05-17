@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Asistente Bellita — Bazar Bellita</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --pink:        #ED93B1;
+      --pink-mid:    #D4537E;
+      --pink-dark:   #993556;
+      --pink-deep:   #72243E;
+      --pink-light:  #FBEAF0;
+      --pink-soft:   #F4C0D1;
+      --teal:        #1D9E75;
+      --teal-light:  #E1F5EE;
+      --teal-dark:   #0F6E56;
+      --amber:       #EF9F27;
+      --amber-light: #FAEEDA;
+      --amber-dark:  #854F0B;
+      --green:       #639922;
+      --green-light: #EAF3DE;
+      --green-dark:  #3B6D11;
+      --red:         #E24B4A;
+      --red-light:   #FCEBEB;
+      --red-dark:    #A32D2D;
+      --bg:          #ffffff;
+      --bg2:         #f8f5f6;
+      --bg3:         #f0ebed;
+      --txt:         #1a1015;
+      --txt2:        #6b5560;
+      --txt3:        #9b8090;
+      --border:      rgba(100,50,70,0.12);
+      --border2:     rgba(100,50,70,0.22);
+      --radius:      12px;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg:          #1a1015;
+        --bg2:         #231520;
+        --bg3:         #2c1b26;
+        --txt:         #f5eef2;
+        --txt2:        #c49ab0;
+        --txt3:        #8a6070;
+        --border:      rgba(240,180,210,0.1);
+        --border2:     rgba(240,180,210,0.2);
+        --pink-light:  #3a1828;
+        --pink-soft:   #5a2038;
+        --teal-light:  #0a2e22;
+        --amber-light: #2e1e04;
+        --green-light: #162308;
+        --red-light:   #2e1010;
+      }
+    }
+
+    html, body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg2);
+      color: var(--txt);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+
+    .app-wrapper { width: 100%; max-width: 680px; }
+
+    /* HEADER */
+    .header { display: flex; align-items: center; gap: 16px; margin-bottom: 1.25rem; }
+    .logo {
+      width: 52px; height: 52px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--pink-soft), var(--pink));
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'DM Serif Display', serif; font-size: 22px; color: var(--pink-deep);
+      flex-shrink: 0; box-shadow: 0 3px 12px rgba(212,83,126,0.3);
+    }
+    .header-text h1 { font-family: 'DM Serif Display', serif; font-size: 22px; font-weight: 400; color: var(--txt); line-height: 1.2; }
+    .header-text p  { font-size: 13px; color: var(--txt2); margin-top: 2px; }
+    .header-actions { margin-left: auto; display: flex; gap: 8px; }
+    .icon-btn {
+      width: 36px; height: 36px; border-radius: 8px; border: 0.5px solid var(--border);
+      background: var(--bg); color: var(--txt2); display: flex; align-items: center;
+      justify-content: center; cursor: pointer; font-size: 17px; transition: all 0.15s;
+    }
+    .icon-btn:hover { background: var(--bg3); color: var(--txt); }
+    .icon-btn.av    { background: var(--pink-light); border-color: var(--pink); color: var(--pink-dark); }
+
+    /* STATUS BAR */
+    .status-bar { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 1rem; }
+    .badge {
+      padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 500;
+      display: flex; align-items: center; gap: 5px;
+    }
+    .badge.ok      { background: var(--green-light); color: var(--green-dark); }
+    .badge.err     { background: var(--red-light);   color: var(--red-dark); }
+    .badge.loading { background: var(--amber-light);  color: var(--amber-dark); }
+    .badge.info    { background: var(--pink-light);   color: var(--pink-dark); }
+    .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+    .dot.pulse { animation: pulse 1.5s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.25} }
+
+    /* CHAT BOX */
+    .chat-box {
+      background: var(--bg); border: 0.5px solid var(--border); border-radius: var(--radius);
+      min-height: 300px; max-height: 390px; overflow-y: auto; padding: 1rem;
+      margin-bottom: 0.75rem; display: flex; flex-direction: column; gap: 12px; scroll-behavior: smooth;
+    }
+    .chat-box::-webkit-scrollbar { width: 4px; }
+    .chat-box::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
+
+    .msg { display: flex; gap: 10px; align-items: flex-start; animation: msgIn 0.2s ease-out; }
+    @keyframes msgIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:none} }
+    .msg.user { flex-direction: row-reverse; }
+
+    .avatar {
+      width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 500;
+    }
+    .avatar.ai   { background: var(--pink-soft); color: var(--pink-deep); font-family: 'DM Serif Display', serif; font-size: 15px; }
+    .avatar.user { background: var(--teal-light); color: var(--teal-dark); }
+
+    .bubble { max-width: 76%; padding: 10px 14px; border-radius: 14px; font-size: 14px; line-height: 1.6; }
+    .msg.ai   .bubble { background: var(--bg2); border: 0.5px solid var(--border); color: var(--txt); border-top-left-radius: 4px; }
+    .msg.user .bubble { background: var(--pink-soft); color: var(--pink-deep); border-top-right-radius: 4px; }
+
+    .bubble.typing { padding: 12px 16px; }
+    .bubble.typing span {
+      display: inline-block; width: 7px; height: 7px; border-radius: 50%;
+      background: var(--pink-mid); margin: 0 2px; animation: blink 1.1s infinite;
+    }
+    .bubble.typing span:nth-child(2){animation-delay:0.18s}
+    .bubble.typing span:nth-child(3){animation-delay:0.36s}
+    @keyframes blink{0%,80%,100%{opacity:0.2;transform:scale(0.8)}40%{opacity:1;transform:scale(1)}}
+
+    /* PRODUCT CARDS */
+    .products-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(110px,1fr)); gap: 8px; margin-top: 10px; }
+    .prod-card {
+      background: var(--bg); border: 0.5px solid var(--border); border-radius: 10px;
+      padding: 8px; text-align: center; transition: border-color 0.15s;
+    }
+    .prod-card:hover { border-color: var(--pink); }
+    .prod-card .pcat  { font-size: 9px; color: var(--teal-dark); background: var(--teal-light); padding: 2px 5px; border-radius: 8px; display: inline-block; margin-bottom: 4px; }
+    .prod-card .pname  { font-size: 11px; font-weight: 500; color: var(--txt); line-height: 1.3; }
+    .prod-card .pprice { font-size: 12px; color: var(--pink-dark); font-weight: 500; margin-top: 3px; }
+    .prod-card .pstock { font-size: 10px; color: var(--txt3); margin-top: 2px; }
+    .prod-card .pstock.low { color: var(--red-dark); font-weight: 500; }
+
+    /* VOICE BAR */
+    .voice-bar {
+      display: none; align-items: center; gap: 8px; padding: 7px 14px;
+      background: var(--pink-light); border: 0.5px solid var(--pink);
+      border-radius: 20px; margin-bottom: 8px; font-size: 13px; color: var(--pink-dark);
+    }
+    .voice-bar.show { display: flex; }
+    .wave { display: flex; gap: 2px; align-items: center; }
+    .wave span {
+      display: block; width: 3px; background: var(--pink-mid); border-radius: 2px;
+      animation: wave 0.7s ease-in-out infinite;
+    }
+    .wave span:nth-child(1){height:5px;  animation-delay:0s}
+    .wave span:nth-child(2){height:12px; animation-delay:0.1s}
+    .wave span:nth-child(3){height:7px;  animation-delay:0.2s}
+    .wave span:nth-child(4){height:14px; animation-delay:0.15s}
+    .wave span:nth-child(5){height:5px;  animation-delay:0.05s}
+    @keyframes wave{0%,100%{transform:scaleY(1)}50%{transform:scaleY(0.35)}}
+
+    /* QUICK BUTTONS */
+    .quick-btns { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+    .quick {
+      padding: 5px 11px; border-radius: 20px; border: 0.5px solid var(--border);
+      background: var(--bg); color: var(--txt2); font-size: 12px; cursor: pointer;
+      transition: all 0.15s; font-family: 'DM Sans', sans-serif;
+    }
+    .quick:hover { border-color: var(--pink); color: var(--pink-dark); background: var(--pink-light); }
+
+    /* CONTROLS */
+    .controls { display: grid; grid-template-columns: 1fr auto auto; gap: 8px; align-items: center; }
+    .inp-wrap input {
+      width: 100%; padding: 11px 16px; border-radius: 10px; border: 0.5px solid var(--border);
+      background: var(--bg); color: var(--txt); font-family: 'DM Sans', sans-serif;
+      font-size: 14px; outline: none; transition: border-color 0.15s;
+    }
+    .inp-wrap input::placeholder { color: var(--txt3); }
+    .inp-wrap input:focus { border-color: var(--pink); }
+    .ctrl-btn {
+      width: 44px; height: 44px; border-radius: 10px; border: 0.5px solid var(--border);
+      background: var(--bg); color: var(--txt2); display: flex; align-items: center;
+      justify-content: center; cursor: pointer; font-size: 18px; transition: all 0.15s; flex-shrink: 0;
+    }
+    .ctrl-btn:hover { background: var(--bg3); }
+    .ctrl-btn.mic  { background: var(--pink-light); border-color: var(--pink); color: var(--pink-dark); }
+    .ctrl-btn.mic.recording { background: var(--pink-soft); animation: ring 1s infinite; }
+    @keyframes ring{0%,100%{box-shadow:0 0 0 0 rgba(212,83,126,0.4)}50%{box-shadow:0 0 0 8px rgba(212,83,126,0)}}
+    .ctrl-btn.send { background: var(--pink-light); border-color: var(--pink); color: var(--pink-dark); }
+    .ctrl-btn.send:hover { background: var(--pink-soft); }
+    .ctrl-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    /* FOOTER */
+    .footer { margin-top: 0.75rem; text-align: center; font-size: 11px; color: var(--txt3); }
+
+    @media (max-width: 500px) {
+      html, body { padding: 0.5rem; }
+      .chat-box { max-height: 320px; }
+      .bubble { max-width: 88%; }
+    }
+  </style>
+</head>
+<body>
+<div class="app-wrapper">
+
+  <div class="header">
+    <div class="logo">B</div>
+    <div class="header-text">
+      <h1>Asistente Bellita ✨</h1>
+      <p>Asistente con voz · Conectada a tu tienda</p>
+    </div>
+    <div class="header-actions">
+      <button class="icon-btn av" id="volBtn" title="Activar/Desactivar voz" onclick="toggleVoz()">
+        <i class="ti ti-volume" aria-hidden="true"></i>
+      </button>
+      <button class="icon-btn" title="Recargar productos" onclick="recargar()">
+        <i class="ti ti-refresh" aria-hidden="true"></i>
+      </button>
+      <button class="icon-btn" title="Limpiar chat" onclick="limpiarChat()">
+        <i class="ti ti-trash" aria-hidden="true"></i>
+      </button>
+    </div>
+  </div>
+
+  <div class="status-bar" id="statusBar">
+    <div class="badge loading"><div class="dot pulse"></div>Conectando a la tienda...</div>
+  </div>
+
+  <div class="chat-box" id="chatBox" role="log" aria-live="polite"></div>
+
+  <div class="voice-bar" id="voiceBar">
+    <div class="wave" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
+    Escuchando... habla ahora
+  </div>
+
+  <div class="quick-btns" role="toolbar">
+    <button class="quick" onclick="enviar('¿Qué productos tienen disponibles?')">📦 Ver catálogo</button>
+    <button class="quick" onclick="enviar('¿Cuáles son los productos más baratos?')">💰 Más baratos</button>
+    <button class="quick" onclick="enviar('¿Qué productos tienen más stock?')">🏪 Con stock</button>
+    <button class="quick" onclick="enviar('Dame los productos más caros')">💎 Premium</button>
+    <button class="quick" onclick="enviar('¿Qué categorías manejan?')">🗂️ Categorías</button>
+    <button class="quick" onclick="enviar('¿Qué productos tienen poco stock?')">⚠️ Poco stock</button>
+  </div>
+
+  <div class="controls">
+    <div class="inp-wrap">
+      <input type="text" id="userInput" placeholder="Escribe o usa el micrófono..."
+        onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();enviar()}" />
+    </div>
+    <button class="ctrl-btn mic" id="micBtn" onclick="toggleMic()" aria-label="Micrófono">
+      <i class="ti ti-microphone" aria-hidden="true"></i>
+    </button>
+    <button class="ctrl-btn send" id="sendBtn" onclick="enviar()" aria-label="Enviar">
+      <i class="ti ti-send" aria-hidden="true"></i>
+    </button>
+  </div>
+
+  <div class="footer">Bazar Bellita · Asistente con voz · Sin dependencias externas</div>
+</div>
+
+<script>
+/* ══════════════════════════════════════════════════
+   CONFIGURACIÓN — cambia solo esta URL
+══════════════════════════════════════════════════ */
+const API_BASE = "https://bazar-bellita.onrender.com";
+
+/* ══════════════════════════════════════════════════
+   ESTADO
+══════════════════════════════════════════════════ */
+let productos = [];
+let voicing   = true;
+let enviando  = false;
+let recog     = null;
+let listening = false;
+const synth   = window.speechSynthesis;
+
+/* ══════════════════════════════════════════════════
+   CARGAR PRODUCTOS DESDE TU BACKEND
+══════════════════════════════════════════════════ */
+async function cargarProductos() {
+  const endpoints = ['/productos', '/api/productos', '/products', '/api/products', '/items'];
+  for (const ep of endpoints) {
+    try {
+      const res = await fetch(API_BASE + ep, { signal: AbortSignal.timeout(9000) });
+      if (!res.ok) continue;
+      const data = await res.json();
+      const arr = Array.isArray(data) ? data
+        : (data.data || data.productos || data.products || data.items || []);
+      if (Array.isArray(arr) && arr.length > 0) {
+        productos = arr;
+        return true;
+      }
+    } catch (_) {}
+  }
+  return false;
+}
+
+function setStatus(ok) {
+  const bar = document.getElementById('statusBar');
+  const vozBadge = `<div class="badge info"><div class="dot"></div>Voz ${voicing ? 'activa' : 'silenciada'}</div>`;
+  if (ok) {
+    bar.innerHTML = `
+      <div class="badge ok"><div class="dot"></div>Tienda conectada</div>
+      <div class="badge ok"><div class="dot"></div>${productos.length} productos</div>
+      ${vozBadge}`;
+  } else {
+    bar.innerHTML = `
+      <div class="badge err"><div class="dot"></div>Sin conexión al servidor</div>
+      <div class="badge ok"><div class="dot"></div>Asistente activa</div>
+      ${vozBadge}`;
+  }
+}
+
+async function recargar() {
+  const bar = document.getElementById('statusBar');
+  bar.innerHTML = `<div class="badge loading"><div class="dot pulse"></div>Recargando productos...</div>`;
+  const ok = await cargarProductos();
+  setStatus(ok);
+  if (ok) addMsg('ai', `¡Listo! Recargué el catálogo, tengo ${productos.length} productos actualizados. ¿En qué te ayudo?`);
+  else     addMsg('ai', 'No pude conectarme al servidor ahora mismo. Puedes intentarlo de nuevo en un momento.');
+}
+
+/* ══════════════════════════════════════════════════
+   HELPERS DE PRODUCTOS
+══════════════════════════════════════════════════ */
+const nombre   = p => p.nombre      || p.name     || p.title    || 'Producto';
+const precio   = p => parseFloat(p.precioVenta || p.precio || p.price || p.costo || p.valor || 0) || 0;
+const stock    = p => parseInt(p.stock || p.cantidad || p.inventory || 0) || 0;
+const codigo   = p => p.codigo      || p.code     || p.sku      || '';
+const categStr = p => p.categoria   || p.category || p.tipo     || '';
+
+function categorias() {
+  const cats = {};
+  productos.forEach(p => {
+    const c = categStr(p);
+    if (c) cats[c] = (cats[c] || 0) + 1;
+  });
+  return cats;
+}
+
+function ordenarPorPrecio(asc)  { return [...productos].filter(p => precio(p) > 0).sort((a,b) => asc ? precio(a)-precio(b) : precio(b)-precio(a)); }
+function ordenarPorStock(asc)   { return [...productos].sort((a,b) => asc ? stock(a)-stock(b) : stock(b)-stock(a)); }
+function buscarPorTexto(q)      {
+  const lq = q.toLowerCase();
+  return productos.filter(p => {
+    const n = nombre(p).toLowerCase();
+    const c = categStr(p).toLowerCase();
+    const d = (p.descripcion || p.description || '').toLowerCase();
+    return n.includes(lq) || c.includes(lq) || d.includes(lq)
+      || lq.split(' ').some(w => w.length > 3 && (n.includes(w) || c.includes(w)));
+  });
+}
+
+function stockBajo(umbral = 5) {
+  return productos.filter(p => stock(p) > 0 && stock(p) <= umbral);
+}
+
+function formatPrecio(n) { return `$${Number(n).toFixed(2)}`; }
+
+/* ══════════════════════════════════════════════════
+   MOTOR DE RESPUESTAS — sin IA externa
+══════════════════════════════════════════════════ */
+function responder(msg) {
+  const q = msg.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+
+  // Sin productos cargados
+  if (productos.length === 0) {
+    return {
+      texto: 'Por ahora no tengo acceso al catálogo de la tienda. Puedes recargar con el botón de arriba o escribir directamente tu pregunta y te ayudo con lo que pueda.',
+      cards: []
+    };
+  }
+
+  // CATEGORÍAS
+  if (q.includes('categoria') || q.includes('tipo') || q.includes('seccion') || q.includes('area')) {
+    const cats = categorias();
+    const lista = Object.entries(cats).map(([c,n]) => `${c} (${n} producto${n>1?'s':''})`).join(', ');
+    return {
+      texto: lista
+        ? `En Bazar Bellita manejamos estas categorías: ${lista}. ¿Quieres ver los productos de alguna en particular?`
+        : `Tenemos ${productos.length} productos disponibles. ¿Sobre cuál te gustaría saber más?`,
+      cards: []
+    };
+  }
+
+  // VER TODOS / CATÁLOGO
+  if ((q.includes('ver') && (q.includes('catalogo') || q.includes('todo') || q.includes('producto')))
+      || q.includes('que tienen') || q.includes('que venden') || q.includes('disponible') && q.includes('producto')
+      || q === 'catalogo' || q === 'productos') {
+    const muestra = productos.slice(0, 8);
+    return {
+      texto: `Tenemos ${productos.length} productos disponibles en la tienda. Aquí te muestro una selección. ¿Buscas algo en particular?`,
+      cards: muestra
+    };
+  }
+
+  // MÁS BARATOS
+  if (q.includes('barato') || q.includes('economico') || q.includes('precio bajo') || q.includes('menor precio') || q.includes('mas accesible')) {
+    const lista = ordenarPorPrecio(true).slice(0, 8);
+    const minP  = lista[0];
+    return {
+      texto: `El producto más económico es ${nombre(minP)} a ${formatPrecio(precio(minP))}. Aquí te muestro los ${lista.length} más baratos del catálogo.`,
+      cards: lista
+    };
+  }
+
+  // MÁS CAROS / PREMIUM
+  if (q.includes('caro') || q.includes('premium') || q.includes('lujo') || q.includes('mayor precio') || q.includes('mas costoso')) {
+    const lista = ordenarPorPrecio(false).slice(0, 8);
+    const maxP  = lista[0];
+    return {
+      texto: `El producto premium es ${nombre(maxP)} a ${formatPrecio(precio(maxP))}. Estos son los artículos de mayor valor en nuestra tienda.`,
+      cards: lista
+    };
+  }
+
+  // MÁS STOCK
+  if (q.includes('mas stock') || q.includes('mas cantidad') || q.includes('mas disponible') || (q.includes('stock') && (q.includes('mas') || q.includes('mayor') || q.includes('alto')))) {
+    const lista = ordenarPorStock(false).slice(0, 8);
+    return {
+      texto: `Estos son los productos con mayor disponibilidad en la tienda ahora mismo.`,
+      cards: lista
+    };
+  }
+
+  // POCO STOCK / AGOTÁNDOSE
+  if (q.includes('poco stock') || q.includes('agotando') || q.includes('pocos') || q.includes('quedan pocos') || q.includes('escaso')) {
+    const lista = stockBajo(5);
+    if (lista.length === 0) {
+      return { texto: '¡Buenas noticias! En este momento no hay productos con stock crítico. Todo está bien abastecido.', cards: [] };
+    }
+    return {
+      texto: `Hay ${lista.length} producto${lista.length > 1 ? 's' : ''} con stock bajo (5 unidades o menos). Te recomiendo considerar reabastecer estos artículos pronto.`,
+      cards: lista
+    };
+  }
+
+  // STOCK CERO / AGOTADOS
+  if (q.includes('agotado') || q.includes('sin stock') || q.includes('stock 0') || q.includes('no hay')) {
+    const lista = productos.filter(p => stock(p) === 0);
+    if (lista.length === 0) {
+      return { texto: '¡Excelente! En este momento todos los productos tienen stock disponible. No hay artículos agotados.', cards: [] };
+    }
+    return {
+      texto: `Tenemos ${lista.length} producto${lista.length > 1 ? 's' : ''} sin stock actualmente.`,
+      cards: lista.slice(0, 8)
+    };
+  }
+
+  // PRECIO DE UN PRODUCTO ESPECÍFICO
+  if (q.includes('cuanto cuesta') || q.includes('cuanto vale') || q.includes('precio de') || q.includes('precio del')) {
+    const termino = msg.replace(/cuanto (cuesta|vale)|precio (de|del|la|el)/gi, '').trim();
+    const found = buscarPorTexto(termino);
+    if (found.length === 1) {
+      const p = found[0];
+      return { texto: `${nombre(p)} tiene un precio de ${formatPrecio(precio(p))} y hay ${stock(p)} unidades disponibles.`, cards: [p] };
+    } else if (found.length > 1) {
+      return { texto: `Encontré ${found.length} productos relacionados con "${termino}". Te los muestro para que elijas.`, cards: found.slice(0, 8) };
+    } else {
+      return { texto: `No encontré un producto llamado "${termino}" en el catálogo. ¿Puedes verificar el nombre o describírmelo de otra forma?`, cards: [] };
+    }
+  }
+
+  // STOCK DE UN PRODUCTO
+  if (q.includes('cuanto stock') || q.includes('cuantos quedan') || q.includes('stock de') || q.includes('cuantas unidades')) {
+    const termino = msg.replace(/cuanto stock|cuantos quedan|stock de(l|la)?|cuantas unidades (de|del|hay)/gi, '').trim();
+    const found = buscarPorTexto(termino);
+    if (found.length === 1) {
+      const p = found[0];
+      const s = stock(p);
+      const msg2 = s === 0 ? 'está agotado' : s <= 5 ? `tiene solo ${s} unidades (¡stock bajo!)` : `tiene ${s} unidades disponibles`;
+      return { texto: `${nombre(p)} ${msg2}.`, cards: [p] };
+    } else if (found.length > 1) {
+      return { texto: `Encontré varios productos relacionados. Aquí el stock de cada uno.`, cards: found.slice(0, 6) };
+    }
+  }
+
+  // BUSCAR POR CÓDIGO
+  if (q.includes('codigo') || q.includes('code') || q.includes('sku')) {
+    const cod = msg.replace(/codigo|code|sku|buscar|con/gi, '').trim().toUpperCase();
+    const found = productos.filter(p => (codigo(p) || '').toUpperCase().includes(cod));
+    if (found.length > 0) {
+      return { texto: `Encontré ${found.length} producto${found.length > 1 ? 's' : ''} con el código "${cod}".`, cards: found.slice(0, 8) };
+    } else {
+      return { texto: `No encontré ningún producto con el código "${cod}". ¿Quieres buscar por nombre en su lugar?`, cards: [] };
+    }
+  }
+
+  // RECOMENDACIÓN
+  if (q.includes('recomiend') || q.includes('sugieres') || q.includes('sugiere') || q.includes('que compro') || q.includes('que llevo')) {
+    const disponibles = productos.filter(p => stock(p) > 0);
+    if (disponibles.length === 0) { return { texto: 'En este momento no hay productos con stock disponible.', cards: [] }; }
+    const random = [...disponibles].sort(() => Math.random() - 0.5).slice(0, 4);
+    return {
+      texto: `¡Con mucho gusto! Aquí te recomiendo algunos de nuestros productos disponibles. ¿Alguno te llama la atención?`,
+      cards: random
+    };
+  }
+
+  // TOTAL DE PRODUCTOS
+  if ((q.includes('cuantos') || q.includes('cuanto') || q.includes('total')) && q.includes('producto')) {
+    const disponibles = productos.filter(p => stock(p) > 0).length;
+    return { texto: `El catálogo de Bazar Bellita cuenta con ${productos.length} productos en total, de los cuales ${disponibles} tienen stock disponible ahora mismo.`, cards: [] };
+  }
+
+  // BUSCAR POR CATEGORÍA explícita
+  const cats = categorias();
+  for (const cat of Object.keys(cats)) {
+    if (q.includes(cat.toLowerCase())) {
+      const lista = productos.filter(p => categStr(p).toLowerCase() === cat.toLowerCase());
+      return {
+        texto: `Tenemos ${lista.length} producto${lista.length > 1 ? 's' : ''} en la categoría ${cat}. ¡Aquí los tienes!`,
+        cards: lista.slice(0, 8)
+      };
+    }
+  }
+
+  // BÚSQUEDA GENERAL POR TEXTO
+  const found = buscarPorTexto(q);
+  if (found.length > 0) {
+    return {
+      texto: found.length === 1
+        ? `Encontré ${nombre(found[0])}: precio ${formatPrecio(precio(found[0]))}, stock: ${stock(found[0])} unidades.`
+        : `Encontré ${found.length} producto${found.length > 1 ? 's' : ''} relacionados con tu búsqueda.`,
+      cards: found.slice(0, 8)
+    };
+  }
+
+  // SALUDOS
+  if (q.match(/^(hola|hi|hey|buenas|buen dia|buenos dias|buenas tardes|buenas noches|saludos)$/)) {
+    return { texto: `¡Hola! Soy Bellita, tu asistente de Bazar Bellita. Tengo acceso a ${productos.length} productos de la tienda. ¿En qué te puedo ayudar hoy?`, cards: [] };
+  }
+  if (q.includes('gracias')) {
+    return { texto: '¡Con mucho gusto! Aquí estaré para lo que necesites. ¿Hay algo más en lo que pueda ayudarte?', cards: [] };
+  }
+  if (q.includes('adios') || q.includes('hasta luego') || q.includes('chao') || q.includes('bye')) {
+    return { texto: '¡Hasta pronto! Fue un placer ayudarte. Vuelve cuando quieras, Bellita siempre estará aquí.', cards: [] };
+  }
+  if (q.includes('quien eres') || q.includes('que eres') || q.includes('como te llamas')) {
+    return { texto: `Soy Bellita, la asistente virtual de Bazar Bellita. Conozco todo el catálogo de la tienda y puedo ayudarte a buscar productos por precio, stock, nombre o categoría. ¡Pregúntame lo que quieras!`, cards: [] };
+  }
+
+  // FALLBACK
+  return {
+    texto: `No encontré productos que coincidan con "${msg}". Puedes pedirme ver el catálogo completo, buscar por categoría, precio o stock. ¿Cómo te puedo ayudar?`,
+    cards: []
+  };
+}
+
+/* ══════════════════════════════════════════════════
+   CHAT UI
+══════════════════════════════════════════════════ */
+function addMsg(rol, texto, cards) {
+  const box = document.getElementById('chatBox');
+  const w   = document.createElement('div'); w.className = `msg ${rol}`;
+  const av  = document.createElement('div'); av.className = `avatar ${rol}`;
+  av.textContent = rol === 'ai' ? 'B' : 'Tú'[0];
+  av.setAttribute('aria-hidden','true');
+  const b = document.createElement('div'); b.className = 'bubble';
+  b.textContent = texto;
+
+  if (cards && cards.length > 0) {
+    const grid = document.createElement('div'); grid.className = 'products-grid';
+    cards.slice(0, 8).forEach(p => {
+      const c   = document.createElement('div'); c.className = 'prod-card';
+      const s   = stock(p);
+      const cat = categStr(p);
+      c.innerHTML = `
+        ${cat ? `<div class="pcat">${cat}</div>` : ''}
+        <div class="pname">${nombre(p)}</div>
+        ${precio(p) > 0 ? `<div class="pprice">${formatPrecio(precio(p))}</div>` : ''}
+        <div class="pstock ${s <= 3 && s > 0 ? 'low' : ''}">${s === 0 ? 'Agotado' : s <= 3 ? `Solo ${s} ud.` : `Stock: ${s}`}</div>`;
+      grid.appendChild(c);
+    });
+    b.appendChild(grid);
+  }
+
+  w.appendChild(av); w.appendChild(b); box.appendChild(w);
+  box.scrollTop = box.scrollHeight;
+}
+
+function addTyping() {
+  const box = document.getElementById('chatBox');
+  const w   = document.createElement('div'); w.className = 'msg ai'; w.id = 'typing';
+  w.innerHTML = `<div class="avatar ai" aria-hidden="true">B</div><div class="bubble typing"><span></span><span></span><span></span></div>`;
+  box.appendChild(w); box.scrollTop = box.scrollHeight;
+}
+function rmTyping() { document.getElementById('typing')?.remove(); }
+
+function limpiarChat() {
+  document.getElementById('chatBox').innerHTML = '';
+  addMsg('ai', '¡Chat limpio! ¿En qué te puedo ayudar ahora?');
+}
+
+/* ══════════════════════════════════════════════════
+   VOZ (TTS)
+══════════════════════════════════════════════════ */
+function speak(txt) {
+  if (!voicing || !synth) return;
+  synth.cancel();
+  const u = new SpeechSynthesisUtterance(txt.substring(0, 250));
+  u.lang = 'es-ES'; u.rate = 1.05; u.pitch = 1.1;
+  const vs = synth.getVoices();
+  const best = vs.find(v => v.lang === 'es-ES' && v.name.toLowerCase().includes('female'))
+    || vs.find(v => v.lang === 'es-EC')
+    || vs.find(v => v.lang.startsWith('es-') && (v.name.includes('María') || v.name.includes('Monica') || v.name.includes('Lucia')))
+    || vs.find(v => v.lang.startsWith('es'));
+  if (best) u.voice = best;
+  synth.speak(u);
+}
+
+function toggleVoz() {
+  voicing = !voicing; synth.cancel();
+  const btn = document.getElementById('volBtn');
+  btn.innerHTML = voicing ? '<i class="ti ti-volume" aria-hidden="true"></i>' : '<i class="ti ti-volume-off" aria-hidden="true"></i>';
+  btn.className  = voicing ? 'icon-btn av' : 'icon-btn';
+  setStatus(productos.length > 0);
+}
+
+/* ══════════════════════════════════════════════════
+   VOZ (STT)
+══════════════════════════════════════════════════ */
+function setupSpeech() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) return;
+  recog = new SR();
+  recog.lang = 'es-ES'; recog.interimResults = false; recog.maxAlternatives = 1;
+  recog.onresult = e => {
+    const t = e.results[0][0].transcript;
+    document.getElementById('userInput').value = t;
+    stopListen(); enviar(t);
+  };
+  recog.onerror = () => stopListen();
+  recog.onend   = () => stopListen();
+}
+
+function toggleMic() { listening ? stopListen() : startListen(); }
+function startListen() {
+  if (!recog) { addMsg('ai', 'Tu navegador no soporta reconocimiento de voz. Escribe tu mensaje por favor.'); return; }
+  synth.cancel(); listening = true;
+  try { recog.start(); } catch(_) { stopListen(); return; }
+  document.getElementById('micBtn').classList.add('recording');
+  document.getElementById('voiceBar').classList.add('show');
+}
+function stopListen() {
+  listening = false; try { recog?.stop(); } catch(_) {}
+  document.getElementById('micBtn').classList.remove('recording');
+  document.getElementById('voiceBar').classList.remove('show');
+}
+
+/* ══════════════════════════════════════════════════
+   ENVIAR MENSAJE
+══════════════════════════════════════════════════ */
+async function enviar(txt) {
+  if (enviando) return;
+  const inp = document.getElementById('userInput');
+  const msg = (txt || inp.value).trim();
+  if (!msg) return;
+  enviando = true; inp.value = '';
+  document.getElementById('sendBtn').disabled = true;
+  addMsg('user', msg);
+  addTyping();
+
+  // Pequeña pausa para simular procesamiento natural
+  await new Promise(r => setTimeout(r, 350));
+
+  rmTyping();
+  const { texto, cards } = responder(msg);
+  addMsg('ai', texto, cards);
+  speak(texto);
+
+  enviando = false;
+  document.getElementById('sendBtn').disabled = false;
+  inp.focus();
+}
+
+/* ══════════════════════════════════════════════════
+   INICIALIZACIÓN
+══════════════════════════════════════════════════ */
+async function init() {
+  setupSpeech();
+  if (synth.onvoiceschanged !== undefined) synth.onvoiceschanged = () => {};
+
+  addMsg('ai', '¡Hola! Soy Bellita, tu asistente de Bazar Bellita. Un momento mientras cargo el catálogo de la tienda...');
+
+  const ok = await cargarProductos();
+  setStatus(ok);
+
+  const bienvenida = ok
+    ? `¡Listo! Tengo acceso a ${productos.length} productos de la tienda. Puedo ayudarte a buscar por precio, stock, categoría o nombre. ¿En qué te puedo ayudar hoy?`
+    : '¡Hola! El servidor puede estar iniciándose (la primera vez tarda hasta 30 segundos en Render). Puedes usar el botón de recarga en cualquier momento. ¿En qué te puedo ayudar?';
+
+  addMsg('ai', bienvenida);
+  speak(bienvenida);
+}
+
+init();
+</script>
+</body>
+</html>
